@@ -41,7 +41,10 @@ class Agent:
             prey_loc = [-5,-5]
         
         if self.args.capability_aware:
-            observation = np.array([*state_space['poses'][:, self.index ][:2], *prey_loc, self.sensing_radius, self.capture_radius])
+            if self.args.dual_channel:
+                observation = np.array([[*state_space['poses'][:, self.index ][:2], *prey_loc], [self.sensing_radius, self.capture_radius]])
+            else:
+                observation = np.array([*state_space['poses'][:, self.index ][:2], *prey_loc, self.sensing_radius, self.capture_radius])
         elif self.args.class_id:
             if self.sensing_radius > 1:
                 observation = np.array([*state_space['poses'][:, self.index ][:2], *prey_loc, 1, 0])             
