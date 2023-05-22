@@ -5,6 +5,7 @@ import importlib
 import json
 import torch
 from rps.utilities.misc import *
+import logging
 
 def is_close( agent_poses, agent_index, prey_loc, sensing_radius):
     agent_pose = agent_poses[:2, agent_index]
@@ -71,7 +72,7 @@ def load_env_and_model(args, module_dir):
         model_weights = torch.load( args.model_file, map_location=torch.device('cpu'))
     else:
         model_weights = torch.load( os.path.join(module_dir,  "scenarios", args.scenario, "models", args.model_file),\
-                         map_location=torch.device('cpu'))
+                                map_location=torch.device('cpu'))
     input_dim = model_weights[list(model_weights.keys())[0]].shape[1]
 
     if module_dir == "":
@@ -114,6 +115,8 @@ def run_env(config, module_dir):
                 #Gets the q values and then the action from the q values
                 if 'NS' in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs.T))
+                elif hasattr(env, "adj_matrix"):
+                    q_values, hs = model(torch.Tensor(obs), torch.Tensor(env.adj_matrix))
                 else:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs))
                     
@@ -138,6 +141,7 @@ def run_env(config, module_dir):
             totalSteps.append(episodeSteps)
     except Exception as error:
         print(error)
+        logging.exception("Fatal Error")
     finally:
         print(f'\nReward: {totalReward}, Mean: {np.mean(totalReward)}, Standard Deviation: {np.std(totalReward)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')
