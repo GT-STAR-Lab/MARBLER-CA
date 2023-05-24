@@ -1,11 +1,11 @@
 #Arguments needed by main.py
 scenario: PredatorCapturePreyGNN #name of the folder inside scenarios
 
-model_config_file: qmix.json
-model_file: qmix.th
+model_config_file: config.json
+model_file: agent.th
 
-actor_file: rnn_agent
-actor_class: RNNAgent
+actor_file: gnn_agent
+actor_class: GNNAgent
 
 env_file: PredatorCapturePreyGNN
 env_class: PredatorCapturePreyGNN #This needs to have all of the functionalities of a gym to work
