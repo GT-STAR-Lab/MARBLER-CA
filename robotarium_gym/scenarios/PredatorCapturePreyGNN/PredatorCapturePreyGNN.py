@@ -22,9 +22,17 @@ class PredatorCapturePreyGNN(BaseEnv):
         # with open(f'{module_dir}/predefined_agents.yaml', 'r') as stream:
         #     self.predefined_agents = yaml.safe_load(stream)
 
-        with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
-            self.predefined_coalition = yaml.safe_load(stream)
+        
         np.random.seed(self.args.seed)
+
+        if(args.hard_coded_coalition):
+            self.args.resample = False
+            with open(f'{module_dir}/grid_search_coalitions.yaml', 'r') as stream:
+                self.predefined_coalition = yaml.safe_load(stream)
+        
+        else:
+            with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
+                self.predefined_coalition = yaml.safe_load(stream)
 
         self.num_robots = args.n_agents
         self.agent_poses = None # robotarium convention poses

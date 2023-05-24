@@ -10,12 +10,12 @@ actor_class: GNNAgent
 env_file: PredatorCapturePreyGNN
 env_class: PredatorCapturePreyGNN #This needs to have all of the functionalities of a gym to work
 n_actions: 5 #The number of actions available for the agent
-n_agents: 4
+n_agents: 3
 episodes: 10 #Number of episodes to run for
 shared_reward: True
 
 #Arguments needed by the environment
-show_figure_frequency: 1 #Set to -1 to turn off figures. Needs to be 1 when submitting to Robotarium
+show_figure_frequency: -1 #Set to -1 to turn off figures. Needs to be 1 when submitting to Robotarium
 robotarium: False #Should be False during training to speed up robots, needs to be true when submitting
 real_time: False
 seed: 100
@@ -74,4 +74,5 @@ traits:
 #     distribution: 'normal'
 #     loc: .25
 #     scale: .05
-resample: True #Set to true to resample the agents every episode
+resample: False #Set to true to resample the agents every episode
+hard_coded_coalition: True
