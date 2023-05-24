@@ -2,6 +2,9 @@ import copy
 import yaml
 import numpy as np
 from copy import deepcopy
+import matplotlib.pyplot as plt
+import itertools
+marker = itertools.cycle(('o', '+', 'x', '*', '.', 'X')) 
 
 def generate_coalitions_from_agents(agents, config):
     """Takes the generated agents, and forms coalitions
@@ -21,8 +24,16 @@ def generate_coalitions_from_agents(agents, config):
         for num_agents in num_robots_list:
             num_agents_str = str(num_agents) + "_agents"
             coalitions[t]["coalitions"][num_agents_str] = {}
+            out = input("Would you like to visualize the coalitions for %d_%s agents?\n" % (num_agents, t))
+            
+            if out == "y":
+                plot_coalitions = True
+            else:
+                plot_coalitions = False
+            
             for k in range(num_coalitions):
-
+                x = []
+                y = []
                 # create a coalition
                 num_capture_agents = np.random.randint(num_agents - 1) + 1
                 num_predator_agents = num_agents - num_capture_agents
@@ -36,8 +47,21 @@ def generate_coalitions_from_agents(agents, config):
 
                 for i, idx in enumerate(predator_idxs):
                     coalitions[t]["coalitions"][num_agents_str][k]["predator"][int(i)] = deepcopy(predator_agents[idx])
+                    x.append(float(predator_agents[idx]["sensing_radius"])); y.append(0)
                 for i, idx in enumerate(capture_idxs):
                     coalitions[t]["coalitions"][num_agents_str][k]["capture"][int(i)] = deepcopy(capture_agents[idx])
+                    y.append(float(capture_agents[idx]["capture_radius"])); x.append(0)
+            
+                if(plot_coalitions):
+                    plt.plot(x, y, marker=next(marker), markersize=15, label=f"C{k}")
+
+            if(plot_coalitions):
+                plt.legend()
+                plt.xlabel("Predator Sensing Radius")
+                plt.ylabel("Capturer Capture Radius")
+                plt.title("Coaltions: %d agents, %s set" % (num_agents, t))
+                plt.show()
+
     return coalitions
 
             
@@ -91,12 +115,18 @@ def main():
         agents['test_predator'][i]['sensing_radius'] = float(val)
         candidate += 1
 
-    with open('predefined_coalition_agents.yaml', 'w') as outfile:
-        yaml.dump(agents, outfile, default_flow_style=False, allow_unicode=True)
+    
 
     coalitions = generate_coalitions_from_agents(agents, config)
-    with open('predefined_coalitions.yaml', 'w') as outfile:
-        yaml.dump(coalitions, outfile, default_flow_style=False, allow_unicode=True)
+    out = input("Would you like to save these as the new predefined coalitions?[y/N]\n")
+    if(out == "y"):
+        with open('predefined_coalitions.yaml', 'w') as outfile:
+            yaml.dump(coalitions, outfile, default_flow_style=False, allow_unicode=True)
+
+        with open('predefined_coalition_agents.yaml', 'w') as outfile:
+            yaml.dump(agents, outfile, default_flow_style=False, allow_unicode=True)
+    else:
+        print("Coalitions not saved.")
 
 if __name__ == '__main__':
     main()
