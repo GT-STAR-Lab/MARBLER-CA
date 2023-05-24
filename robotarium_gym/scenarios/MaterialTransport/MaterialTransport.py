@@ -63,6 +63,9 @@ class MaterialTransport(BaseEnv):
         del self.zone1_args['distribution']   
         self.zone2_args = copy.deepcopy(self.args.zone2)
         del self.zone2_args['distribution']  
+
+        if self.args.seed != -1:
+             np.random.seed(self.args.seed)
         
         #This isn't really needed but makes a bunch of stuff clearer
         self.action_id2w = {0: 'left', 1: 'right', 2: 'up', 3:'down', 4:'no_action'}
@@ -131,9 +134,13 @@ class MaterialTransport(BaseEnv):
                             terminated = False
                             break
         else:
-            print("Ending due to", return_message)
+            #print("Ending due to", return_message)
             reward = -6
             terminated = True
+        
+        if terminated:
+            print(f'Remaining: {self.zone1_load + self.zone2_load + sum(a.load for a in self.agents)} {return_message}')        
+ 
         return obs, [reward] * self.num_robots, [terminated]*self.num_robots, {}
     
     def get_observations(self):

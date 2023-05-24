@@ -33,6 +33,9 @@ class ArcticTransport(BaseEnv):
         start_z = [math.pi/2]*self.num_robots
         self.start_poses = np.array([start_x, start_y, start_z])
 
+        if self.args.seed != -1:
+             np.random.seed(self.args.seed)
+
         #Initializes the action and observation spaces
         actions = []
         observations = []
@@ -97,9 +100,16 @@ class ArcticTransport(BaseEnv):
                         terminated = False
                         break
         else:
-            print("Ending due to", message)
+            #print("Ending due to", message)
             reward = -30
             terminated = True
+
+        if terminated:
+            if message == '':
+                print(self.episode_steps)
+            else:
+                print((self.args.max_episode_steps+1), message)
+        
         return obs, [reward]*self.num_robots, [terminated]*self.num_robots, {}
 
     def get_observations(self):
