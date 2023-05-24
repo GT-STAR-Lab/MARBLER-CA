@@ -1,0 +1,184 @@
+capture:
+  0:
+    capture_radius: 0.18699486603200294
+    id: '000000'
+  1:
+    capture_radius: 0.06878774494747114
+    id: '000001'
+  2:
+    capture_radius: 0.24332363303102594
+    id: '000010'
+  3:
+    capture_radius: 0.17203764807258554
+    id: '000011'
+  4:
+    capture_radius: 0.09149119251000822
+    id: '000100'
+  5:
+    capture_radius: 0.2173078554205497
+    id: '000101'
+  6:
+    capture_radius: 0.22093044055684202
+    id: '000110'
+  7:
+    capture_radius: 0.11184906360646588
+    id: '000111'
+  8:
+    capture_radius: 0.15764061213949887
+    id: '001000'
+  9:
+    capture_radius: 0.17481308792786981
+    id: '001001'
+  10:
+    capture_radius: 0.06782654774268862
+    id: '001010'
+  11:
+    capture_radius: 0.2047307761758576
+    id: '001011'
+  12:
+    capture_radius: 0.19134917802064927
+    id: '001100'
+  13:
+    capture_radius: 0.11029222115503712
+    id: '001101'
+  14:
+    capture_radius: 0.09160732346113415
+    id: '001110'
+  15:
+    capture_radius: 0.08030794585000903
+    id: '001111'
+  16:
+    capture_radius: 0.06931692360230696
+    id: '010000'
+  17:
+    capture_radius: 0.11288190566460819
+    id: '010001'
+  18:
+    capture_radius: 0.0798664270221805
+    id: '010010'
+  19:
+    capture_radius: 0.14546445601258176
+    id: '010011'
+  20:
+    capture_radius: 0.09803436459631931
+    id: '010100'
+  21:
+    capture_radius: 0.24218128986746246
+    id: '010101'
+  22:
+    capture_radius: 0.1147409678767182
+    id: '010110'
+  23:
+    capture_radius: 0.19520169187321962
+    id: '010111'
+  24:
+    capture_radius: 0.11331506611104279
+    id: '011000'
+predator:
+  0:
+    id: '011001'
+    sensing_radius: 0.29321785804873934
+  1:
+    id: '011010'
+    sensing_radius: 0.5671222302901524
+  2:
+    id: '011011'
+    sensing_radius: 0.5288424525651497
+  3:
+    id: '011100'
+    sensing_radius: 0.37132613443413187
+  4:
+    id: '011101'
+    sensing_radius: 0.3867441795572888
+  5:
+    id: '011110'
+    sensing_radius: 0.5449899613445438
+  6:
+    id: '011111'
+    sensing_radius: 0.24260259859125655
+  7:
+    id: '100000'
+    sensing_radius: 0.5075564411515889
+  8:
+    id: '100001'
+    sensing_radius: 0.4246762557134274
+  9:
+    id: '100010'
+    sensing_radius: 0.29966685854251185
+  10:
+    id: '100011'
+    sensing_radius: 0.5238423317001921
+  11:
+    id: '100100'
+    sensing_radius: 0.4475858440031216
+  12:
+    id: '100101'
+    sensing_radius: 0.2362479515004172
+  13:
+    id: '100110'
+    sensing_radius: 0.4937889415366197
+  14:
+    id: '100111'
+    sensing_radius: 0.37783247783674456
+  15:
+    id: '101000'
+    sensing_radius: 0.4666195331541004
+  16:
+    id: '101001'
+    sensing_radius: 0.5837344980348359
+  17:
+    id: '101010'
+    sensing_radius: 0.5856995388240711
+  18:
+    id: '101011'
+    sensing_radius: 0.5700403721403335
+  19:
+    id: '101100'
+    sensing_radius: 0.5858109951368925
+  20:
+    id: '101101'
+    sensing_radius: 0.3463165396911754
+  21:
+    id: '101110'
+    sensing_radius: 0.28645830655650306
+  22:
+    id: '101111'
+    sensing_radius: 0.49086296825619175
+  23:
+    id: '110000'
+    sensing_radius: 0.30001491217837045
+  24:
+    id: '110001'
+    sensing_radius: 0.5232129853818306
+test_capture:
+  0:
+    capture_radius: 0.05329280027758696
+    id: '110010'
+  1:
+    capture_radius: 0.15974157037812414
+    id: '110011'
+  2:
+    capture_radius: 0.21586019058323253
+    id: '110100'
+  3:
+    capture_radius: 0.061694004017291415
+    id: '110101'
+  4:
+    capture_radius: 0.1605211086749221
+    id: '110110'
+test_predator:
+  0:
+    id: '110111'
+    sensing_radius: 0.4454576465047394
+  1:
+    id: '111000'
+    sensing_radius: 0.4889093453906889
+  2:
+    id: '111001'
+    sensing_radius: 0.26624628987021
+  3:
+    id: '111010'
+    sensing_radius: 0.44659189907236096
+  4:
+    id: '111011'
+    sensing_radius: 0.45156346447651685

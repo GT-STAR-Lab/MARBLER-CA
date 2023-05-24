@@ -19,8 +19,11 @@ class PredatorCapturePreyGNN(BaseEnv):
         # print(f"\033[0;32m{args.__dict__}\033[00m")
 
         module_dir = os.path.dirname(__file__)
-        with open(f'{module_dir}/predefined_agents.yaml', 'r') as stream:
-            self.predefined_agents = yaml.safe_load(stream)
+        # with open(f'{module_dir}/predefined_agents.yaml', 'r') as stream:
+        #     self.predefined_agents = yaml.safe_load(stream)
+
+        with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
+            self.predefined_coalition = yaml.safe_load(stream)
         np.random.seed(self.args.seed)
 
         self.num_robots = args.n_agents
@@ -36,30 +39,31 @@ class PredatorCapturePreyGNN(BaseEnv):
         num_predator_agents = self.num_robots - num_capture_agents
         self.agents = []
 
-        # Initialize predator agents
-        index = 0
-        if self.args.test:
-            agent_type = 'test_predator'
-            predator_idxs = np.random.randint(self.args.n_predator_agents, size=num_predator_agents)
-        else:
-            agent_type = 'predator'
-            predator_idxs = np.random.randint(self.args.n_test_predator_agents, size=num_predator_agents)
-        for i in predator_idxs:
-            self.agents.append( Agent(index, self.predefined_agents[agent_type][i]['sensing_radius'],\
-                                      0, self.action_id2w, self.action_w2id, self.args) )
-            index += 1
+        self.agents = self.load_agents()
+        # # Initialize predator agents
+        # index = 0
+        # if self.args.test:
+        #     agent_type = 'test_predator'
+        #     predator_idxs = np.random.randint(self.args.n_predator_agents, size=num_predator_agents)
+        # else:
+        #     agent_type = 'predator'
+        #     predator_idxs = np.random.randint(self.args.n_test_predator_agents, size=num_predator_agents)
+        # for i in predator_idxs:
+        #     self.agents.append( Agent(index, self.predefined_agents[agent_type][i]['sensing_radius'],\
+        #                               0, self.action_id2w, self.action_w2id, self.args) )
+        #     index += 1
 
-        # Initialize capture agents
-        if self.args.test:
-            agent_type = 'test_capture'
-            capture_idxs = np.random.randint(self.args.n_test_capture_agents, size=num_capture_agents)
-        else:
-            agent_type = 'capture'
-            capture_idxs = np.random.randint(self.args.n_capture_agents, size=num_capture_agents)
-        for i in capture_idxs:
-            self.agents.append( Agent(index, 0, self.predefined_agents[agent_type][i]['capture_radius'],\
-                                       self.action_id2w, self.action_w2id, self.args) )
-            index += 1
+        # # Initialize capture agents
+        # if self.args.test:
+        #     agent_type = 'test_capture'
+        #     capture_idxs = np.random.randint(self.args.n_test_capture_agents, size=num_capture_agents)
+        # else:
+        #     agent_type = 'capture'
+        #     capture_idxs = np.random.randint(self.args.n_capture_agents, size=num_capture_agents)
+        # for i in capture_idxs:
+        #     self.agents.append( Agent(index, 0, self.predefined_agents[agent_type][i]['capture_radius'],\
+        #                                self.action_id2w, self.action_w2id, self.args) )
+        #     index += 1
 
         if self.args.capability_aware:
             self.agent_obs_dim = 6
@@ -132,41 +136,62 @@ class PredatorCapturePreyGNN(BaseEnv):
             if not self.prey_captured[i]:
                 state_space['prey'].append(np.array(self.prey_loc[i]).reshape((2,1)))
         return state_space
+    def load_agents(self):
+        '''Loades the pre-defined agents / coalitions
+        '''
+        t = "train"
+        if self.args.test:
+            t = "test"
+        agents = []
+        
+        # sample a new coalition
+        coalition_idx = np.random.randint(self.args.n_coalitions)
+        s = str(self.num_robots) + "_agents"
+        capture_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["capture"]
+        predator_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["predator"]
+        
+        for idx, agent in capture_agents.items():
+            agents.append(Agent(idx, 0, agent["capture_radius"], self.action_id2w, self.action_id2w, self.args))
+
+        for idx, agent in predator_agents.items():
+            agents.append(Agent(idx, agent["sensing_radius"], 0, self.action_id2w, self.action_id2w, self.args))
+        return agents
     
     def reset(self):
         '''
         Resets the simulation
         '''
         if self.args.resample:
-            #Initializes the agents
-            num_capture_agents = np.random.randint(self.num_robots - 1) + 1
-            num_predator_agents = self.num_robots - num_capture_agents
-            self.agents = []
+            # #Initializes the agents
+            # num_capture_agents = np.random.randint(self.num_robots - 1) + 1
+            # num_predator_agents = self.num_robots - num_capture_agents
+            # self.agents = []
         
-            # Initialize predator agents
-            index = 0
-            if self.args.test:
-                agent_type = 'test_predator'
-                predator_idxs = np.random.randint(self.args.n_predator_agents, size=num_predator_agents)
-            else:
-                agent_type = 'predator'
-                predator_idxs = np.random.randint(self.args.n_test_predator_agents, size=num_predator_agents)
-            for i in predator_idxs:
-                self.agents.append( Agent(index, self.predefined_agents[agent_type][i]['sensing_radius'],\
-                                        0, self.action_id2w, self.action_w2id, self.args) )
-                index += 1
+            # # Initialize predator agents
+            # index = 0
+            # if self.args.test:
+            #     agent_type = 'test_predator'
+            #     predator_idxs = np.random.randint(self.args.n_predator_agents, size=num_predator_agents)
+            # else:
+            #     agent_type = 'predator'
+            #     predator_idxs = np.random.randint(self.args.n_test_predator_agents, size=num_predator_agents)
+            # for i in predator_idxs:
+            #     self.agents.append( Agent(index, self.predefined_agents[agent_type][i]['sensing_radius'],\
+            #                             0, self.action_id2w, self.action_w2id, self.args) )
+            #     index += 1
 
-            # Initialize capture agents
-            if self.args.test:
-                agent_type = 'test_capture'
-                capture_idxs = np.random.randint(self.args.n_test_capture_agents, size=num_capture_agents)
-            else:
-                agent_type = 'capture'
-                capture_idxs = np.random.randint(self.args.n_capture_agents, size=num_capture_agents)
-            for i in capture_idxs:
-                self.agents.append( Agent(index, 0, self.predefined_agents[agent_type][i]['capture_radius'],\
-                                        self.action_id2w, self.action_w2id, self.args) )
-                index += 1
+            # # Initialize capture agents
+            # if self.args.test:
+            #     agent_type = 'test_capture'
+            #     capture_idxs = np.random.randint(self.args.n_test_capture_agents, size=num_capture_agents)
+            # else:
+            #     agent_type = 'capture'
+            #     capture_idxs = np.random.randint(self.args.n_capture_agents, size=num_capture_agents)
+            # for i in capture_idxs:
+            #     self.agents.append( Agent(index, 0, self.predefined_agents[agent_type][i]['capture_radius'],\
+            #                             self.action_id2w, self.action_w2id, self.args) )
+            #     index += 1
+            self.agents = self.load_agents()
 
         self.episode_steps = 0
         self.prey_locs = []
@@ -219,7 +244,7 @@ class PredatorCapturePreyGNN(BaseEnv):
         
         # terminate if needed
         if self.episode_steps > self.args.max_episode_steps or \
-            updated_state['num_prey'] == 0:
+            (updated_state['num_prey'] == 0 and self.args.terminate_on_success):
             terminated = True    
 
         info = {
@@ -262,7 +287,12 @@ class PredatorCapturePreyGNN(BaseEnv):
         reward = 0
         reward += (self.state_space['unseen_prey'] - state_space['unseen_prey']) * self.args.sense_reward
         reward += (self.state_space['num_prey'] - state_space['num_prey']) * self.args.capture_reward
-        reward += self.args.time_penalty
+
+        # if all the prey have been captured, don't penalize the agents anymore.
+        if( not self.args.terminate_on_success and state_space['num_prey']==0):
+            reward += -1 * self.args.time_penalty
+        else:
+            reward += self.args.time_penalty
         self.state_space = state_space
         return reward
     
