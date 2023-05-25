@@ -153,7 +153,12 @@ class PredatorCapturePreyGNN(BaseEnv):
         agents = []
         
         # sample a new coalition
-        coalition_idx = np.random.randint(self.args.n_coalitions)
+        if(self.args.manual_coalition_selection):
+            coalition_idx = self.args.coalition_selection
+        else:
+            coalition_idx = np.random.randint(self.args.n_coalitions)
+            
+        # coalition_idx = self.args.coalition_idx
         s = str(self.num_robots) + "_agents"
         capture_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["capture"]
         predator_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["predator"]

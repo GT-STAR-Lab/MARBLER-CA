@@ -35,8 +35,13 @@ def generate_coalitions_from_agents(agents, config):
                 x = []
                 y = []
                 # create a coalition
-                num_capture_agents = np.random.randint(num_agents - 1) + 1
-                num_predator_agents = num_agents - num_capture_agents
+                val = np.random.uniform(0, 1.0)
+                if(val < 0.5):
+                    num_capture_agents = np.random.randint(num_agents - 1) + 1
+                    num_predator_agents = num_agents - num_capture_agents
+                else:
+                    num_predator_agents = np.random.randint(num_agents - 1) + 1
+                    num_capture_agents = num_agents - num_predator_agents
 
                 predator_idxs = np.random.randint(config["n_predator_agents"], size=num_predator_agents)
                 capture_idxs = np.random.randint(config["n_capture_agents"], size=num_capture_agents)
@@ -52,15 +57,19 @@ def generate_coalitions_from_agents(agents, config):
                     coalitions[t]["coalitions"][num_agents_str][k]["capture"][int(i)] = deepcopy(capture_agents[idx])
                     y.append(float(capture_agents[idx]["capture_radius"])); x.append(0)
             
-                if(plot_coalitions):
-                    plt.plot(x, y, marker=next(marker), markersize=15, label=f"C{k}")
+                
+                plt.plot(x, y, marker=next(marker), markersize=15, label=f"C{k}")
+
+            plt.legend()
+            plt.xlabel("Predator Sensing Radius")
+            plt.ylabel("Capturer Capture Radius")
+            plt.title("Coaltions: %d agents, %s set" % (num_agents, t))
+            plt.savefig("coalition_figures/%s_%d_agents.png" % (t, num_agents))
 
             if(plot_coalitions):
-                plt.legend()
-                plt.xlabel("Predator Sensing Radius")
-                plt.ylabel("Capturer Capture Radius")
-                plt.title("Coaltions: %d agents, %s set" % (num_agents, t))
+                
                 plt.show()
+
 
     return coalitions
 
