@@ -298,7 +298,7 @@ class PredatorCapturePreyGNN(BaseEnv):
 
         # if all the prey have been captured, don't penalize the agents anymore.
         if( not self.args.terminate_on_success and state_space['num_prey']==0):
-            reward += -1 * self.args.time_penalty
+            reward += 0
         else:
             reward += self.args.time_penalty
         self.state_space = state_space
