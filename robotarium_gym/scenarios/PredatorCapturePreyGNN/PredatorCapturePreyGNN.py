@@ -22,9 +22,17 @@ class PredatorCapturePreyGNN(BaseEnv):
         # with open(f'{module_dir}/predefined_agents.yaml', 'r') as stream:
         #     self.predefined_agents = yaml.safe_load(stream)
 
-        with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
-            self.predefined_coalition = yaml.safe_load(stream)
+        
         np.random.seed(self.args.seed)
+
+        if(args.hard_coded_coalition):
+            self.args.resample = False
+            with open(f'{module_dir}/grid_search_coalitions.yaml', 'r') as stream:
+                self.predefined_coalition = yaml.safe_load(stream)
+        
+        else:
+            with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
+                self.predefined_coalition = yaml.safe_load(stream)
 
         self.num_robots = args.n_agents
         self.agent_poses = None # robotarium convention poses
@@ -145,7 +153,12 @@ class PredatorCapturePreyGNN(BaseEnv):
         agents = []
         
         # sample a new coalition
-        coalition_idx = np.random.randint(self.args.n_coalitions)
+        if(self.args.manual_coalition_selection):
+            coalition_idx = self.args.coalition_selection
+        else:
+            coalition_idx = np.random.randint(self.args.n_coalitions)
+            
+        # coalition_idx = self.args.coalition_idx
         s = str(self.num_robots) + "_agents"
         capture_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["capture"]
         predator_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["predator"]
@@ -290,7 +303,7 @@ class PredatorCapturePreyGNN(BaseEnv):
 
         # if all the prey have been captured, don't penalize the agents anymore.
         if( not self.args.terminate_on_success and state_space['num_prey']==0):
-            reward += -1 * self.args.time_penalty
+            reward += 0
         else:
             reward += self.args.time_penalty
         self.state_space = state_space
