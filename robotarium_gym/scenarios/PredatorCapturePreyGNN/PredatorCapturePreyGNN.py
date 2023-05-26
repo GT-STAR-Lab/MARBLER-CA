@@ -163,11 +163,13 @@ class PredatorCapturePreyGNN(BaseEnv):
         capture_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["capture"]
         predator_agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]["predator"]
         
+        index = 0
         for idx, agent in capture_agents.items():
-            agents.append(Agent(idx, 0, agent["capture_radius"], self.action_id2w, self.action_id2w, self.args))
-
+            agents.append(Agent(index, 0, agent["capture_radius"], self.action_id2w, self.action_w2id, self.args))
+            index += 1
         for idx, agent in predator_agents.items():
-            agents.append(Agent(idx, agent["sensing_radius"], 0, self.action_id2w, self.action_id2w, self.args))
+            agents.append(Agent(index, agent["sensing_radius"], 0, self.action_id2w, self.action_w2id, self.args))
+            index += 1
         return agents
     
     def reset(self):
