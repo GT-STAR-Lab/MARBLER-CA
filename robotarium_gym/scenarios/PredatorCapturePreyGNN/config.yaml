@@ -40,7 +40,7 @@ PREY_INIT_LEFT_THRESH : 0.5
 time_penalty: -0.05
 sense_reward: 1
 capture_reward: 5
-num_prey: 4
+num_prey: 8
 test: False #Set this to change the agents that are being selected from
 #If the following two are False, make sure resample is also False
 capability_aware: True #Either the agent know what class they're in or their capabilities. Make sure this matches training
@@ -57,16 +57,16 @@ n_coalitions: 10
 traits:
   predator:
     distribution: 'uniform'
-    low: 0.2
-    high: 0.6
+    low: 0.30
+    high: 0.55
   capture:
     distribution: 'uniform'
-    low: 0.05
-    high: 0.25
+    low: 0.35
+    high: 0.45
 
 # manual select coalitions
 manual_coalition_selection: True
-coalition_selection: 4
+coalition_selection: 0
 
 # traits:
 #   predator:

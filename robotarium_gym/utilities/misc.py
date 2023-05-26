@@ -82,9 +82,11 @@ def load_env_and_model(args, module_dir):
     actor = getattr(actor, args.actor_class)
     
     model_config.n_agents = args.n_agents
+    if(model_config.agent == "dual_channel_gnn" or model_config.agent == "dual_channel_gat"):
+        input_dim = model_weights["channel_A.encoder.0.weight"].shape[1] + model_weights["channel_B.encoder.0.weight"].shape[1]
     model = actor(input_dim, model_config)
     model.load_state_dict(model_weights)
-
+    
     if module_dir == "":
         env_module = importlib.import_module(args.env_file)
     else:
