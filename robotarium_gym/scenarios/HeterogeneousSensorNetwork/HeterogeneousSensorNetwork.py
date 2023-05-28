@@ -231,9 +231,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         for a1 in self.agents:
             for a2 in self.agents:
                 dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
-                reward -= abs(dist - (a1.radius + a2.radius))
+                reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
 
-        reward -= min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents])
+        reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         return reward
     
     def get_action_space(self):
