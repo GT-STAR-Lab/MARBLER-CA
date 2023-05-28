@@ -22,8 +22,8 @@ class PredatorCapturePreyGNN(BaseEnv):
         # with open(f'{module_dir}/predefined_agents.yaml', 'r') as stream:
         #     self.predefined_agents = yaml.safe_load(stream)
 
-        
-        np.random.seed(self.args.seed)
+        if self.args.seed != -1:
+            np.random.seed(self.args.seed)
 
         if(args.hard_coded_coalition):
             self.args.resample = False
@@ -252,7 +252,9 @@ class PredatorCapturePreyGNN(BaseEnv):
             if self.args.end_ep_on_violation and return_message != '':
                 violation_occurred += 1
                 # print("violation: ", return_message)
-                rewards += self.args.violation_penalty
+                # rewards += self.args.violation_penalty
+                rewards += -5.0
+                terminated=True
             elif not self.args.end_ep_on_violation:
                 violation_occurred = return_message
                 rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise

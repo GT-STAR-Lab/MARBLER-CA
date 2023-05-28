@@ -18,7 +18,7 @@ shared_reward: True
 show_figure_frequency: -1 #Set to -1 to turn off figures. Needs to be 1 when submitting to Robotarium
 robotarium: False #Should be False during training to speed up robots, needs to be true when submitting
 real_time: False
-seed: 100
+seed: -1
 barrier_certificate: default #Can be safe or default for strong or weak barrier certificates
 penalize_violations: True # violation=robot collision w/ each other or boundary, does not terminate early
 end_ep_on_violation: True
@@ -40,7 +40,7 @@ PREY_INIT_LEFT_THRESH : 0.5
 time_penalty: -0.05
 sense_reward: 1
 capture_reward: 5
-num_prey: 8
+num_prey: 6
 test: False #Set this to change the agents that are being selected from
 #If the following two are False, make sure resample is also False
 capability_aware: True #Either the agent know what class they're in or their capabilities. Make sure this matches training
