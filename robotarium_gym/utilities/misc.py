@@ -6,6 +6,7 @@ import json
 import torch
 from rps.utilities.misc import *
 import logging
+import sys
 
 def is_close( agent_poses, agent_index, prey_loc, sensing_radius):
     agent_pose = agent_poses[:2, agent_index]
@@ -61,10 +62,12 @@ def load_env_and_model(args, module_dir):
     ''' 
     Helper function to load a model from a specified scenario in args
     '''
+    models_dir = os.path.join(module_dir, "scenarios", args.scenario, "models")
     if module_dir == "":
         model_config =args.model_config_file
     else:
         model_config = os.path.join(module_dir, "scenarios", args.scenario, "models", args.model_config_file)
+        models_dir = os.path.join(module_dir, "scenarios", args.scenario, "models")
     model_config = objectview(json.load(open(model_config)))
     model_config.n_actions = args.n_actions
 
@@ -78,7 +81,9 @@ def load_env_and_model(args, module_dir):
     if module_dir == "":
         actor = importlib.import_module(args.actor_file)
     else:
-        actor = importlib.import_module(f'robotarium_gym.utilities.{args.actor_file}')
+        # actor = importlib.import_module(f'robotarium_gym.utilities.{args.actor_file}')
+        sys.path.append(models_dir)
+        actor = importlib.import_module(f'{args.actor_file}')
     actor = getattr(actor, args.actor_class)
     
     model_config.n_agents = args.n_agents
