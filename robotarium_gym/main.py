@@ -11,10 +11,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--scenario', type=str, default='PredatorCapturePrey', help='scenario name')
     parser.add_argument('--save_dir', type=str, default=None, help='Directory to save the images. Show fig must be true. Set to None not to save')
+    parser.add_argument('--config-dir', type=str, default=None, help='Directory to configuration file. Default (None) will be in the scenarios directory.')
     args = parser.parse_args()
 
     if module_dir == "":
         config_path = "config.yaml"
+    elif args.config_dir is not None:
+        config_path = os.path.join(module_dir, "scenarios", args.scenario,args.config_dir, "config.yaml")
     else:
         config_path = os.path.join(module_dir, "scenarios", args.scenario, "config.yaml")
     with open(config_path, 'r') as f:
