@@ -20,6 +20,7 @@ class Controller:
     def set_velocities(self, agent_poses, goals):
         xi = self.uni_to_si_states(agent_poses)
         dxi = self.single_integrator_position_controller(xi, goals[:2][:])
-        dxi = self.si_barrier_cert(dxi, xi)
+        if self.si_barrier_cert:
+            dxi = self.si_barrier_cert(dxi, xi)
         dxu = self.si_to_uni_dyn(dxi, agent_poses)
         return dxu
