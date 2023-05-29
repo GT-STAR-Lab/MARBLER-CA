@@ -238,11 +238,13 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
 
+        #The agents goal is to get their radii to touch
         for a1 in self.agents:
             for a2 in self.agents:
                 dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
 
+        #This is to center the agents in the middle of the field
         reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         return reward
     
