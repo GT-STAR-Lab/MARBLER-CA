@@ -6,6 +6,7 @@ from .scenarios.MaterialTransport.MaterialTransport import MaterialTransport
 from .scenarios.MaterialTransportGNN.MaterialTransportGNN import MaterialTransportGNN
 from .scenarios.Simple.simple import simple
 from .scenarios.ArcticTransport.ArcticTransport import ArcticTransport
+from .scenarios.HeterogeneousSensorNetwork.HeterogeneousSensorNetwork import HeterogeneousSensorNetwork
 #Add other scenario imports here
 from robotarium_gym.utilities.misc import objectview
 import os
@@ -17,7 +18,8 @@ env_dict = {'PredatorCapturePrey': PredatorCapturePrey,
             'MaterialTransport': MaterialTransport,
             "MaterialTransportGNN": MaterialTransportGNN,
             'Simple': simple,
-            'ArcticTransport': ArcticTransport}
+            'ArcticTransport': ArcticTransport,
+            "HeterogeneousSensorNetwork": HeterogeneousSensorNetwork}
 
 
 class Wrapper(Env):
