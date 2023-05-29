@@ -15,7 +15,7 @@ episodes: 10 #Number of episodes to run for
 shared_reward: True
 
 #Arguments needed by the environment
-show_figure_frequency: -1 #Set to -1 to turn off figures. Needs to be 1 when submitting to Robotarium
+show_figure_frequency: 1 #Set to -1 to turn off figures. Needs to be 1 when submitting to Robotarium
 robotarium: False #Should be False during training to speed up robots, needs to be true when submitting
 real_time: False
 seed: -1

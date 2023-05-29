@@ -109,6 +109,14 @@ class HeterogeneousSensorNetwork(BaseEnv):
         self.env = roboEnv(self, args)
         self.adj_matrix = 1-np.identity(self.num_robots, dtype=int)
              
+    def _generate_state_space(self):
+        '''
+        Generates a dictionary describing the state space of the robotarium
+        x: Poses of all the robots
+        '''
+        state_space = {}
+        state_space['poses'] = self.agent_poses
+        return state_space
 
     def _generate_step_goal_positions(self, actions):
         '''
@@ -137,10 +145,10 @@ class HeterogeneousSensorNetwork(BaseEnv):
             
         # coalition_idx = self.args.coalition_idx
         s = str(self.num_robots) + "_agents"
-        agents = self.predefined_coalition[t]["coalitions"][s][coalition_idx]
+        coalition = self.predefined_coalition[t]["coalitions"][s][coalition_idx]
         
         index = 0
-        for idx, agent in agents.items():
+        for idx, agent in coalition.items():
             agents.append(Agent(index, agent["radius"], self.action_id2w, self.args))
             index += 1
         return agents
@@ -181,7 +189,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # call the environment step function and get the updated state
         return_message = self.env.step(actions_)
         
-        self._update_tracking_and_locations(actions_)
+        # self._update_tracking_and_locations(actions_)
         updated_state = self._generate_state_space()
         
         # get the observation and reward from the updated state
@@ -224,6 +232,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
             if self.args.delta > -1:
                 neighbors.append(delta_disk_neighbors(self.agent_poses,a.index,self.args.delta))
 
+        return(observations)
+    
     def get_rewards(self, state_space):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
