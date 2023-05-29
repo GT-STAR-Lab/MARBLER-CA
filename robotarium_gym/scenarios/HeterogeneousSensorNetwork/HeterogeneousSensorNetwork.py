@@ -238,12 +238,20 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
 
-        for a1 in self.agents:
-            for a2 in self.agents:
-                dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
-                reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
-
-        reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
+        #The agents goal is to get their radii to touch
+        for i, a1 in enumerate(self.agents):
+            reward -= np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
+            for j, a2 in enumerate(self.agents, i+1): # don't duplicate
+                dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
+                # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
+                difference = dist - (a1.radius + a2.radius)
+                #reward += max(0, -difference) * self.args.dist_reward_multiplier
+                reward += -1*abs(difference)
+                # reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
+        
+        #This is to center the agents in the middle of the field
+        # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
+        
         return reward
     
     def get_action_space(self):
