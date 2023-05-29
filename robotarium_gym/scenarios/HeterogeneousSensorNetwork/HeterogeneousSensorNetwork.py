@@ -108,15 +108,6 @@ class HeterogeneousSensorNetwork(BaseEnv):
         self.visualizer = Visualize( self.args )
         self.env = roboEnv(self, args)
         self.adj_matrix = 1-np.identity(self.num_robots, dtype=int)
-             
-    def _generate_state_space(self):
-        '''
-        Generates a dictionary describing the state space of the robotarium
-        x: Poses of all the robots
-        '''
-        state_space = {}
-        state_space['poses'] = self.agent_poses
-        return state_space
 
     def _generate_step_goal_positions(self, actions):
         '''
@@ -174,7 +165,6 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         self.episode_steps = 0
         
-        self.state_space = self._generate_state_space()
         self.env.reset()
         return [[0]*self.agent_obs_dim] * self.num_robots
         
@@ -189,12 +179,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # call the environment step function and get the updated state
         return_message = self.env.step(actions_)
         
-        # self._update_tracking_and_locations(actions_)
-        updated_state = self._generate_state_space()
-        
         # get the observation and reward from the updated state
-        obs     = self.get_observations(updated_state)
-        rewards = self.get_rewards(updated_state)
+        obs     = self.get_observations()
+        rewards = self.get_rewards()
 
         # penalize for collisions, record in info
         violation_occurred = 0
@@ -218,7 +205,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         return obs, [rewards]*self.num_robots, [terminated]*self.num_robots, info
 
-    def get_observations(self, state_space):
+    def get_observations(self):
         observations = [] #Each agent's individual observation
         neighbors = [] #Stores the neighbors of each agent if delta > -1
         for a in self.agents:
@@ -234,7 +221,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         return(observations)
     
-    def get_rewards(self, state_space):
+    def get_rewards(self):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
 
