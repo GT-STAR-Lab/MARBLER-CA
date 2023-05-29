@@ -124,7 +124,7 @@ def run_env(config, module_dir, save_dir=None):
                 #Gets the q values and then the action from the q values
                 if 'NS' in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs.T))
-                elif hasattr(env, "adj_matrix"):
+                elif "GNN" in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(env.adj_matrix))
                 else:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs))
