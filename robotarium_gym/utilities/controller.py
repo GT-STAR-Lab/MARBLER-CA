@@ -1,5 +1,6 @@
 from rps.utilities.controllers import *
 from rps.utilities.barrier_certificates import *
+import numpy as np
 
 class Controller:
     def __init__(self, type='safe', custom=None):
@@ -18,9 +19,15 @@ class Controller:
             self.si_barrier_cert = custom
     
     def set_velocities(self, agent_poses, goals):
+        pes = np.linalg.norm(agent_poses[:2, :] - goals[:2], 2, 0)
+        done = np.nonzero((pes <= .02))
+
         xi = self.uni_to_si_states(agent_poses)
         dxi = self.single_integrator_position_controller(xi, goals[:2][:])
         if self.si_barrier_cert:
             dxi = self.si_barrier_cert(dxi, xi)
         dxu = self.si_to_uni_dyn(dxi, agent_poses)
+
+        dxu[:, done] = 0
+
         return dxu
