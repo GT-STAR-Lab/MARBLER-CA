@@ -54,7 +54,7 @@ class Agent:
                       args.RIGHT if goal_pose[0] > args.RIGHT else goal_pose[0]
              goal_pose[1] = args.UP if goal_pose[1] < args.UP else \
                       args.DOWN if goal_pose[1] > args.DOWN else goal_pose[1]
-        
+            
         return goal_pose
                 
 
@@ -203,7 +203,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 violation_occurred += 1
                 # print("violation: ", return_message)
                 rewards += self.args.violation_penalty
-                terminated=True
+                # terminated=True
             elif not self.args.end_ep_on_violation:
                 violation_occurred = return_message
                 rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise
@@ -240,12 +240,13 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
-            reward -= np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
+            
+            # reward agent if they are more towards the center.
+            reward -= 0.5 * np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
             for j, a2 in enumerate(self.agents, i+1): # don't duplicate
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
-                #reward += max(0, -difference) * self.args.dist_reward_multiplier
                 reward += -1*abs(difference)
                 # reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
         
