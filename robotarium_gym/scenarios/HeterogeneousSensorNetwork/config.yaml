@@ -10,7 +10,7 @@ actor_class: GNNAgent
 env_file: HeterogeneousSensorNetwork
 env_class: HeterogeneousSensorNetwork #This needs to have all of the functionalities of a gym to work
 n_actions: 5 #The number of actions available for the agent
-n_agents: 2
+n_agents: 4
 episodes: 10 #Number of episodes to run for
 shared_reward: True
 
@@ -21,7 +21,7 @@ real_time: False
 seed: -1
 barrier_certificate: "default" #Can be safe or default for strong or weak barrier certificates
 penalize_violations: True # violation=robot collision w/ each other or boundary, does not terminate early
-end_ep_on_violation: True
+end_ep_on_violation: True # CURRENTLY NOT ENDING EPISODE
 violation_penalty: -0.05
 delta: -1 #Used to determine the adjacency matrix, set to -1 for full communication
 max_episode_steps: 80
@@ -39,7 +39,8 @@ dist_reward_multiplier: 1.0
 test: False #Set this to change the agents that are being selected from
 #If the following two are False, make sure resample is also False
 capability_aware: True #Either the agent know what class they're in or their capabilities. Make sure this matches training
-dual_channel: False #Changes the observations to make them a 2d array for capabilities and observations if capability_aware is true
+agent_id: False #If capability_aware is False, this determines if the class id is appended instead or not
+dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them a 2d array for capabilities and observations if capability_aware is true
 
 #Information needed to generate the predefined agents and coalitions
 n_train_agents: 50
@@ -52,9 +53,10 @@ traits:
     low: 0.20
     high: 0.60
 
-# manual select coalitions
-manual_coalition_selection: True
+### For experiment 2, turn load_from_predefined_coalitions to false
+load_from_predefined_coalitions: True # Load coalitions from 'predefined_coalition.yaml'. If False, then loads new agents based on traits distribution.
+manual_coalition_selection: False # IF true, the only sample the coalition coalition_selection from the colaition file for "n_agents"
 coalition_selection: 0
 
-resample: False #Set to true to resample the agents every episode
+resample: True #Set to true to resample the agents every episode
 hard_coded_coalition: False

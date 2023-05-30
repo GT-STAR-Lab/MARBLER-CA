@@ -88,7 +88,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         #Initializes the agents
         self.agents = []
 
-        self.agents = self.load_agents()
+        self.agents = self.load_agents_from_predefined_coalitions()
 
         if self.args.capability_aware:
             self.agent_obs_dim = 3
@@ -128,8 +128,23 @@ class HeterogeneousSensorNetwork(BaseEnv):
         for i, agent in enumerate(self.agents):
             goal[:,i] = agent.generate_goal(goal[:,i], actions[i], self.args)
         return goal
+    
+    def load_agents_from_trait_distribution(self):
+        """Loades agents/coaltions from by sampling each agent individually from trait distribution
+        """
+        agents = []
+        func_args = copy.deepcopy(self.args.traits['radius'])
+        del func_args['distribution']
 
-    def load_agents(self):
+        index = 0
+        for idx in range(self.num_robots):
+            radius_val = float(getattr(np.random, self.args.traits["radius"]['distribution'])(**func_args))
+            agents.append(Agent(index, radius_val, self.action_id2w, self.args))
+            index += 1
+    
+        return agents
+
+    def load_agents_from_predefined_coalitions(self):
         '''Loades the pre-defined agents / coalitions
         '''
         t = "train"
@@ -158,9 +173,12 @@ class HeterogeneousSensorNetwork(BaseEnv):
         Resets the simulation
         '''
         if self.args.resample:
-            # #Initializes the agents
-            self.agents = self.load_agents()
-
+            if self.args.load_from_predefined_coalitions:
+                # #Initializes the agents
+                self.agents = self.load_agents_from_predefined_coalitions()
+            else:
+                self.agents = self.load_agents_from_trait_distribution()
+                
         #Generate the agent locations based on the config
         width = self.args.RIGHT - self.args.LEFT
         height = self.args.DOWN - self.args.UP
@@ -221,12 +239,20 @@ class HeterogeneousSensorNetwork(BaseEnv):
     def get_observations(self, state_space):
         observations = [] #Each agent's individual observation
         neighbors = [] #Stores the neighbors of each agent if delta > -1
+
+        def one_hot_encode(number, num_classes):
+            encoded = [0] * num_classes
+            encoded[number] = 1
+            return encoded
+
         for a in self.agents:
             if self.args.capability_aware:
                 if self.args.dual_channel:
                     observations.append([[*self.agent_poses[:, a.index ][:2]], [a.radius]])
                 else:
                     observations.append([*self.agent_poses[:, a.index ][:2], a.radius])
+            elif self.args.agent_id:    # append agent id
+                observations.append([[*self.agent_poses[:, a.index ][:2]], *one_hot_encode(a.index, self.num_robots)])
             else:
                 observations.append([*self.agent_poses[:, a.index ][:2]])
             if self.args.delta > -1:
