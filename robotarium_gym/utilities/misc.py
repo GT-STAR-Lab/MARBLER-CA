@@ -108,12 +108,14 @@ def run_env(config, module_dir, save_dir=None):
     obs = np.array(env.reset())
     n_agents = len(obs)
 
-    totalReward = []
+    totalReturn = []
     totalSteps = []
+    totalViolations = []
     try:
         for i in range(config.episodes):
-            episodeReward = 0
+            episodeReturn = 0
             episodeSteps = 0
+            episodeViolations = 0
             hs = np.array([np.zeros((model_config.hidden_dim, )) for i in range(n_agents)])
             for j in range(config.max_episode_steps+1):      
                 if env.env.visualizer.show_figure and save_dir: 
@@ -131,12 +133,14 @@ def run_env(config, module_dir, save_dir=None):
                     
                 actions = np.argmax(q_values.detach().numpy(), axis=1)
 
-                obs, reward, done, _ = env.step(actions)
+                obs, reward, done, info = env.step(actions)
                 
+                # log data
+                episodeViolations += 1.0 if info["violation_occurred"] else 0.0
                 if model_config.shared_reward:
-                    episodeReward += reward[0]
+                    episodeReturn += reward[0]
                 else:
-                    episodeReward += sum(reward)
+                    episodeReturn += sum(reward)
                 if done[0]:
                     episodeSteps = j+1
                     break
@@ -144,13 +148,28 @@ def run_env(config, module_dir, save_dir=None):
                 episodeSteps = config.max_episode_steps
             obs = np.array(env.reset())
             print('Episode', i+1)
-            print('Episode reward:', episodeReward)
+            print('Episode return:', episodeReturn)
             print('Episode steps:', episodeSteps)
-            totalReward.append(episodeReward)
+            totalReturn.append(episodeReturn)
             totalSteps.append(episodeSteps)
+            totalViolations.append(episodeViolations)
     except Exception as error:
         print(error)
         logging.exception("Fatal Error")
     finally:
-        print(f'\nReward: {totalReward}, Mean: {np.mean(totalReward)}, Standard Deviation: {np.std(totalReward)}')
+
+        eval_data_dict = {
+            "returns": totalReturn,
+            "steps": totalSteps,
+            "violations": totalViolations
+        }
+        
+        unique_token = model_config.unique_token
+        file_path = os.path.join("eval_saves", f"{unique_token}_eval.py")
+        if( not os.path.exists('eval_saves')):
+            os.makedirs('eval_saves')
+
+        with open(file_path, 'w') as file:
+            json.dump(eval_data_dict, file)
+        print(f'\nReturn: {totalReturn}, Mean: {np.mean(totalReturn)}, Standard Deviation: {np.std(totalReturn)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')

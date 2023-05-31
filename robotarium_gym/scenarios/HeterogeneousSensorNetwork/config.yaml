@@ -57,8 +57,8 @@ traits:
 load_from_predefined_coalitions: True # Load coalitions from 'predefined_coalition.yaml'. If False, then loads new agents based on traits distribution.
 manual_coalition_selection: False # IF true, the only sample the coalition coalition_selection from the colaition file for "n_agents"
 coalition_selection: 0
-
 shuffle_agent_order: True # this will shuffle the order of agents when coalition is sampled
-
 resample: True #Set to true to resample the agents every episode
+
+#KEEP FALSE
 hard_coded_coalition: False
