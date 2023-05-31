@@ -32,7 +32,11 @@ def generate_coalitions_from_agents(agents_, config):
             
             for k in range(num_coalitions):
                 
-                agent_idxs = np.random.randint(config["n_" + t + "_agents"], size=num_agents)
+                # num_coalition == num_candidates
+                init_agent_idx = [k]
+                agent_idxs = np.random.randint(config["n_" + t + "_agents"], size=num_agents-1)
+
+                agent_idxs = list(agent_idxs) + init_agent_idx
                 coalitions[t]["coalitions"][num_agents_str][k] ={}
                 coalitions[t]["coalitions"][num_agents_str][k]
                 coalitions[t]["coalitions"][num_agents_str][k]
@@ -70,21 +74,15 @@ def main():
         agents['test'][i]['radius'] = float(val)
         candidate += 1
 
-    
-
-    
-
     coalitions = generate_coalitions_from_agents(agents, config)
     out = input("Would you like to save these as the new predefined coalitions?[y/N]\n")
     if(out == "y"):
-        with open('predefined_coalitions.yaml', 'w') as outfile:
+        with open(config['coalition_file'], 'w') as outfile:
             yaml.dump(coalitions, outfile, default_flow_style=False, allow_unicode=True)
 
-        with open('predefined_coalition_agents.yaml', 'w') as outfile:
+        with open(config['coalition_file'].split(".y")[0] + '_agents.yaml', 'w') as outfile:
             yaml.dump(agents, outfile, default_flow_style=False, allow_unicode=True)
 
-        with open('predefined_agents.yaml', 'w') as outfile:
-            yaml.dump(agents, outfile, default_flow_style=False, allow_unicode=True)
     else:
         print("Coalitions not saved.")
 

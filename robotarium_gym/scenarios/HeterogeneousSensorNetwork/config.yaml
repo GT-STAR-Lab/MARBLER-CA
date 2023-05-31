@@ -43,9 +43,10 @@ agent_id: False #If capability_aware is False, this determines if the class id i
 dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them a 2d array for capabilities and observations if capability_aware is true
 
 #Information needed to generate the predefined agents and coalitions
-n_train_agents: 50
-n_test_agents: 25
-n_coalitions: 10
+n_train_agents: 20
+n_test_agents: 20
+n_coalitions: 20
+coalition_file: "predefined_coalitions_v2.yaml"
 
 traits:
   radius:
@@ -57,7 +58,7 @@ traits:
 load_from_predefined_coalitions: True # Load coalitions from 'predefined_coalition.yaml'. If False, then loads new agents based on traits distribution.
 manual_coalition_selection: False # IF true, the only sample the coalition coalition_selection from the colaition file for "n_agents"
 coalition_selection: 0
-shuffle_agent_order: True # this will shuffle the order of agents when coalition is sampled
+shuffle_agent_order: False # this will shuffle the order of agents when coalition is sampled
 resample: True #Set to true to resample the agents every episode
 
 #KEEP FALSE

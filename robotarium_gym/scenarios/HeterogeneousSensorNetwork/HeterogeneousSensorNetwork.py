@@ -78,7 +78,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 self.predefined_coalition = yaml.safe_load(stream)
         
         else:
-            with open(f'{module_dir}/predefined_coalitions.yaml', 'r') as stream:
+            with open(f'{module_dir}/{args.coalition_file}', 'r') as stream:
                 self.predefined_coalition = yaml.safe_load(stream)
 
         self.num_robots = args.n_agents

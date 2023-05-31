@@ -81,9 +81,9 @@ def load_env_and_model(args, module_dir):
     if module_dir == "":
         actor = importlib.import_module(args.actor_file)
     else:
-        # actor = importlib.import_module(f'robotarium_gym.utilities.{args.actor_file}')
-        sys.path.append(models_dir)
-        actor = importlib.import_module(f'{args.actor_file}')
+        actor = importlib.import_module(f'robotarium_gym.utilities.{args.actor_file}')
+        # sys.path.append(models_dir)
+        # actor = importlib.import_module(f'{args.actor_file}')
     actor = getattr(actor, args.actor_class)
     
     model_config.n_agents = args.n_agents
@@ -165,7 +165,7 @@ def run_env(config, module_dir, save_dir=None):
         }
         
         unique_token = model_config.unique_token
-        file_path = os.path.join("eval_saves", f"{unique_token}_eval.py")
+        file_path = os.path.join("eval_saves", f"{unique_token}_eval.json")
         if( not os.path.exists('eval_saves')):
             os.makedirs('eval_saves')
 

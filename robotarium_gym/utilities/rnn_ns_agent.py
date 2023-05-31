@@ -1,5 +1,5 @@
 import torch.nn as nn
-from robotarium_gym.utilities.rnn_agent import RNNAgent
+from modules.agents.rnn_agent import RNNAgent
 import torch as th
 
 class RNNNSAgent(nn.Module):
