@@ -3,6 +3,7 @@ from gym import spaces
 import copy
 import yaml
 import os
+from copy import deepcopy
 
 #This file should stay as is when copied to robotarium_eval but local imports must be changed to work with training!
 from robotarium_gym.utilities.roboEnv import roboEnv
@@ -178,7 +179,11 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 self.agents = self.load_agents_from_predefined_coalitions()
             else:
                 self.agents = self.load_agents_from_trait_distribution()
-                
+
+        # shuffles the order of agents
+        if self.args.shuffle_agent_order:
+            self.agents = self.shuffle_agents(self.agents)
+        
         #Generate the agent locations based on the config
         width = self.args.RIGHT - self.args.LEFT
         height = self.args.DOWN - self.args.UP
@@ -280,7 +285,13 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         
         return reward
-    
+    def shuffle_agents(self, agents):
+        """
+        Shuffle the order of agents
+        """
+        agents_ = deepcopy(agents)
+        random.shuffle(agents_)
+        return(agents_)
     def get_action_space(self):
         return self.action_space
     
