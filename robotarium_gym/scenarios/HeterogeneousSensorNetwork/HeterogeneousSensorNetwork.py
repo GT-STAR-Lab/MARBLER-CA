@@ -255,12 +255,12 @@ class HeterogeneousSensorNetwork(BaseEnv):
     def get_rewards(self):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
-
+        center_reward = []
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
             
             # reward agent if they are more towards the center.
-            reward -= 0.5 * np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
+            center_reward.append(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
             for j, a2 in enumerate(self.agents, i+1): # don't duplicate
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
@@ -270,7 +270,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
-        
+        reward += min(center_reward)
         return reward
     def shuffle_agents(self, agents):
         """
