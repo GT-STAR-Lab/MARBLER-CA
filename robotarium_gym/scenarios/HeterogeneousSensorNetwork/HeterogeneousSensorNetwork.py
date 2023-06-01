@@ -206,7 +206,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         # get the observation and reward from the updated state
         obs     = self.get_observations()
-        rewards = self.get_rewards()
+        rewards, edges = self.get_rewards()
 
         # penalize for collisions, record in info
         violation_occurred = 0
@@ -227,6 +227,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         info = {
                 "violation_occurred": violation_occurred, # not a true count, just binary for if ANY violation occurred
+                "connectivity": edges
                 } 
         
         return obs, [rewards]*self.num_robots, [terminated]*self.num_robots, info
@@ -259,12 +260,14 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
         center_reward = []
+        edges = 0
+        print("number of agents", len(self.agents))
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
-            
             # reward agent if they are more towards the center.
             center_reward.append(np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0]))))) # push agents towards center
-            for j, a2 in enumerate(self.agents, i+1): # don't duplicate
+            for j, a2 in enumerate(self.agents[i+1:],i+1): # don't duplicate
+                print(i, j)
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
@@ -272,6 +275,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
                 #incur more penatly if the agents boundaries are not touching
                 if(difference < 0): # agents are touching
+                    edges += 1
                     reward += -0.9 * abs(difference)
                 else:
                     reward += -1.1 * abs(difference)
@@ -281,7 +285,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         # reward += -1*min(center_reward)
-        return reward
+        return reward, edges
 
     def shuffle_agents(self, agents):
         """
