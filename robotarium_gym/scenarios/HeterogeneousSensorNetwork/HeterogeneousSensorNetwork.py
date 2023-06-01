@@ -83,7 +83,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         self.num_robots = args.n_agents
         self.agent_poses = None # robotarium convention poses
-        
+        self.episode_number = 0
+
         self.action_id2w = {0: 'left', 1: 'right', 2: 'up', 3:'down', 4:'no_action'}
 
         #Initializes the agents
@@ -164,7 +165,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
         '''
         Resets the simulation
         '''
-        if self.args.resample:
+        self.episode_number += 1
+        if self.args.resample and (self.episode_number % self.args.resample_frequency == 0):
             if self.args.load_from_predefined_coalitions:
                 # #Initializes the agents
                 self.agents = self.load_agents_from_predefined_coalitions()
@@ -260,18 +262,26 @@ class HeterogeneousSensorNetwork(BaseEnv):
         for i, a1 in enumerate(self.agents):
             
             # reward agent if they are more towards the center.
-            center_reward.append(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0])))) # push agents towards center
+            center_reward.append(np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0]))))) # push agents towards center
             for j, a2 in enumerate(self.agents, i+1): # don't duplicate
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
-                reward += -1*abs(difference)
+                # reward += -1*abs(difference)
+
+                #incur more penatly if the agents boundaries are not touching
+                if(difference < 0): # agents are touching
+                    reward += -0.9 * abs(difference)
+                else:
+                    reward += -1.1 * abs(difference)
+                
                 # reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
         
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
-        reward += min(center_reward)
+        # reward += -1*min(center_reward)
         return reward
+
     def shuffle_agents(self, agents):
         """
         Shuffle the order of agents
