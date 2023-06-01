@@ -103,12 +103,13 @@ def load_env_and_model(args, module_dir):
     return env, model, model_config
 
 
-def run_env(config, module_dir, save_dir=None):
+def run_env(config, module_dir, gif_dir=None, eval_dir=None, eval_file_name="default_eval.json"):
     env, model, model_config = load_env_and_model(config, module_dir)
     obs = np.array(env.reset())
     n_agents = len(obs)
 
     totalReturn = []
+    totalAvgConnectivity = []
     totalSteps = []
     totalViolations = []
     try:
@@ -116,10 +117,11 @@ def run_env(config, module_dir, save_dir=None):
             episodeReturn = 0
             episodeSteps = 0
             episodeViolations = 0
+            episodeConnectivity = []
             hs = np.array([np.zeros((model_config.hidden_dim, )) for i in range(n_agents)])
             for j in range(config.max_episode_steps+1):      
-                if env.env.visualizer.show_figure and save_dir: 
-                    plt.savefig(f'{save_dir}/episode{i}step{j}.png')
+                if env.env.visualizer.show_figure and gif_dir: 
+                    plt.savefig(f'{gif_dir}/episode{i}step{j}.png')
                 if model_config.obs_agent_id: #Appends the agent id if obs_agent_id is true. TODO: support obs_last_action too
                     obs = np.concatenate([obs,np.eye(n_agents)], axis=1)
 
@@ -137,6 +139,8 @@ def run_env(config, module_dir, save_dir=None):
                 
                 # log data
                 episodeViolations += 1.0 if info["violation_occurred"] else 0.0
+                episodeConnectivity.append(info["connectivity"])
+
                 if model_config.shared_reward:
                     episodeReturn += reward[0]
                 else:
@@ -152,6 +156,7 @@ def run_env(config, module_dir, save_dir=None):
             print('Episode steps:', episodeSteps)
             totalReturn.append(episodeReturn)
             totalSteps.append(episodeSteps)
+            totalAvgConnectivity.append(np.mean(episodeConnectivity))
             totalViolations.append(episodeViolations)
     except Exception as error:
         print(error)
@@ -161,15 +166,20 @@ def run_env(config, module_dir, save_dir=None):
         eval_data_dict = {
             "returns": totalReturn,
             "steps": totalSteps,
-            "violations": totalViolations
+            "violations": totalViolations,
+            "avg_connectivity": totalAvgConnectivity
         }
         
-        unique_token = model_config.unique_token
-        file_path = os.path.join("eval_saves", f"{unique_token}_eval.json")
-        if( not os.path.exists('eval_saves')):
-            os.makedirs('eval_saves')
-
-        with open(file_path, 'w') as file:
-            json.dump(eval_data_dict, file)
+        if(eval_dir):
+            
+            unique_token = model_config.unique_token
+            file_dir = os.path.join(eval_dir, "eval_saves")
+            if( not os.path.exists(file_dir)):
+                os.makedirs(file_dir)
+            
+            print(eval_file_name)
+            file_path = os.path.join(file_dir, f"{eval_file_name}_eval.json")
+            with open(file_path, 'w') as file:
+                json.dump(eval_data_dict, file)
         print(f'\nReturn: {totalReturn}, Mean: {np.mean(totalReturn)}, Standard Deviation: {np.std(totalReturn)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')
