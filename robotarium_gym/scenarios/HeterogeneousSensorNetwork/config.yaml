@@ -19,9 +19,9 @@ show_figure_frequency: -1 #Set to -1 to turn off figures. Needs to be 1 when sub
 robotarium: False #Should be False during training to speed up robots, needs to be true when submitting
 real_time: False
 seed: -1
-barrier_certificate: "off" #Can be safe or default for strong or weak barrier certificates
-penalize_violations: True # violation=robot collision w/ each other or boundary, does not terminate early
-end_ep_on_violation: False
+barrier_certificate: "default" #Can be safe or default for strong or weak barrier certificates
+penalize_violations: False # violation=robot collision w/ each other or boundary, does not terminate early
+end_ep_on_violation: True
 violation_penalty: -1.0
 delta: -1 #Used to determine the adjacency matrix, set to -1 for full communication
 max_episode_steps: 80
@@ -46,7 +46,7 @@ dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them
 n_train_agents: 20
 n_test_agents: 20
 n_coalitions: 5
-coalition_file: "predefined_coalitions_5_coalitions.yaml"
+coalition_file: "custom_5_coalitions_3_robots.yaml"
 
 traits:
   radius:

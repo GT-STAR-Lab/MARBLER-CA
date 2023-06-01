@@ -214,12 +214,12 @@ class HeterogeneousSensorNetwork(BaseEnv):
             if self.args.end_ep_on_violation and return_message != '':
                 violation_occurred += 1
                 rewards += self.args.violation_penalty
-                terminated=True
+                # terminated=True
             elif not self.args.end_ep_on_violation:
                 violation_occurred += 1
-                rewards += self.args.violation_penalty
-                # violation_occurred = return_message
-                # rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise
+                # rewards += self.args.violation_penalty
+                violation_occurred = return_message
+                rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise
         
         # terminate if needed
         if self.episode_steps > self.args.max_episode_steps:
@@ -261,13 +261,13 @@ class HeterogeneousSensorNetwork(BaseEnv):
         reward = 0
         center_reward = []
         edges = 0
-        print("number of agents", len(self.agents))
+        
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
             # reward agent if they are more towards the center.
             center_reward.append(np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0]))))) # push agents towards center
             for j, a2 in enumerate(self.agents[i+1:],i+1): # don't duplicate
-                print(i, j)
+               
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
@@ -276,15 +276,15 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 #incur more penatly if the agents boundaries are not touching
                 if(difference < 0): # agents are touching
                     edges += 1
-                    reward += -0.9 * abs(difference)
+                    reward += -0.9 * abs(difference) + 0.05
                 else:
-                    reward += -1.1 * abs(difference)
+                    reward += -1.1 * abs(difference) - 0.05 
                 
                 # reward += abs(dist - (a1.radius + a2.radius)) * self.args.dist_reward_multiplier
         
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
-        # reward += -1*min(center_reward)
+        reward += -1*min(center_reward) * self.args.dist_reward_multiplier
         return reward, edges
 
     def shuffle_agents(self, agents):
