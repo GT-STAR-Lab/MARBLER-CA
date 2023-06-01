@@ -10,7 +10,7 @@ actor_class: GNNAgent
 env_file: HeterogeneousSensorNetwork
 env_class: HeterogeneousSensorNetwork #This needs to have all of the functionalities of a gym to work
 n_actions: 5 #The number of actions available for the agent
-n_agents: 4
+n_agents: 3
 episodes: 10 #Number of episodes to run for
 shared_reward: True
 
@@ -19,10 +19,10 @@ show_figure_frequency: 1 #Set to -1 to turn off figures. Needs to be 1 when subm
 robotarium: False #Should be False during training to speed up robots, needs to be true when submitting
 real_time: False
 seed: -1
-barrier_certificate: "default" #Can be safe or default for strong or weak barrier certificates
-penalize_violations: True # violation=robot collision w/ each other or boundary, does not terminate early
-end_ep_on_violation: True # CURRENTLY NOT ENDING EPISODE
-violation_penalty: -0.05
+barrier_certificate: "safe" #Can be safe or default for strong or weak barrier certificates
+penalize_violations: False # violation=robot collision w/ each other or boundary, does not terminate early
+end_ep_on_violation: True
+violation_penalty: -1.0
 delta: -1 #Used to determine the adjacency matrix, set to -1 for full communication
 max_episode_steps: 80
 terminate_on_success: True # If true, then when the number of prey is zero, the environment will terminate. Else environment keeps running.
@@ -43,9 +43,10 @@ agent_id: False #If capability_aware is False, this determines if the class id i
 dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them a 2d array for capabilities and observations if capability_aware is true
 
 #Information needed to generate the predefined agents and coalitions
-n_train_agents: 50
-n_test_agents: 25
-n_coalitions: 10
+n_train_agents: 20
+n_test_agents: 20
+n_coalitions: 5
+coalition_file: "predefined_coalitions_5_coalitions.yaml"
 
 traits:
   radius:
@@ -57,6 +58,9 @@ traits:
 load_from_predefined_coalitions: True # Load coalitions from 'predefined_coalition.yaml'. If False, then loads new agents based on traits distribution.
 manual_coalition_selection: False # IF true, the only sample the coalition coalition_selection from the colaition file for "n_agents"
 coalition_selection: 0
-
+shuffle_agent_order: False # this will shuffle the order of agents when coalition is sampled
 resample: True #Set to true to resample the agents every episode
+resample_frequency: 1
+
+#KEEP FALSE
 hard_coded_coalition: False

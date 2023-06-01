@@ -19,12 +19,12 @@ def main():
     elif args.config_dir is not None:
         config_path = os.path.join(module_dir, "scenarios", args.scenario,args.config_dir, "config.yaml")
     else:
-        config_path = os.path.join(module_dir, "scenarios", args.scenario, "config.yaml")
+        config_path = os.path.join(module_dir, "scenarios", args.scenario, "test_config.yaml")
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     config = objectview(config)
 
-    run_env(config, module_dir, args.save_dir)
+    run_env(config, module_dir, args.save_dir, eval_dir=config_path)
 
 if __name__ == '__main__':
     main()
