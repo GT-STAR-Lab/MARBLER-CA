@@ -213,12 +213,13 @@ class HeterogeneousSensorNetwork(BaseEnv):
         if self.args.penalize_violations:
             if self.args.end_ep_on_violation and return_message != '':
                 violation_occurred += 1
-                # print("violation: ", return_message)
                 rewards += self.args.violation_penalty
-                # terminated=True
+                terminated=True
             elif not self.args.end_ep_on_violation:
-                violation_occurred = return_message
-                rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise
+                violation_occurred += 1
+                rewards += self.args.violation_penalty
+                # violation_occurred = return_message
+                # rewards +=  np.log(return_message+1) * self.args.violation_penalty #Taking the log because this can get out of control otherwise
         
         # terminate if needed
         if self.episode_steps > self.args.max_episode_steps:
