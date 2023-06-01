@@ -21,7 +21,7 @@ real_time: False
 seed: -1
 barrier_certificate: "off" #Can be safe or default for strong or weak barrier certificates
 penalize_violations: True # violation=robot collision w/ each other or boundary, does not terminate early
-end_ep_on_violation: True # CURRENTLY NOT ENDING EPISODE
+end_ep_on_violation: False
 violation_penalty: -1.0
 delta: -1 #Used to determine the adjacency matrix, set to -1 for full communication
 max_episode_steps: 80
