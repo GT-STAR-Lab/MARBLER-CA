@@ -90,7 +90,12 @@ class HeterogeneousSensorNetwork(BaseEnv):
         #Initializes the agents
         self.agents = []
 
-        self.agents = self.load_agents_from_predefined_coalitions()
+        if self.args.load_from_predefined_coalitions:
+            # #Initializes the agents
+            self.agents = self.load_agents_from_predefined_coalitions()
+        else:
+            self.agents = self.load_agents_from_trait_distribution()
+
 
         if self.args.capability_aware:
             self.agent_obs_dim = 3

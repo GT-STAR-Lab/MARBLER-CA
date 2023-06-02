@@ -46,7 +46,7 @@ dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them
 n_train_agents: 20
 n_test_agents: 20
 n_coalitions: 5
-coalition_file: "custom_5_coalitions_3_robots.yaml"
+coalition_file: "custom_5_coalitions_4_robots.yaml"
 
 traits:
   radius:

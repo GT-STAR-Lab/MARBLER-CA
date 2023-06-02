@@ -128,7 +128,7 @@ def run_env(config, module_dir, gif_dir=None, eval_dir=None, eval_file_name="def
                 #Gets the q values and then the action from the q values
                 if 'NS' in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs.T))
-                elif "GNN" in config.actor_class:
+                elif "GNN" in config.actor_class or "GAT" in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(env.adj_matrix))
                 else:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs))
@@ -177,9 +177,10 @@ def run_env(config, module_dir, gif_dir=None, eval_dir=None, eval_file_name="def
             if( not os.path.exists(file_dir)):
                 os.makedirs(file_dir)
             
-            print(eval_file_name)
-            file_path = os.path.join(file_dir, f"{eval_file_name}_eval.json")
+            
+            file_path = os.path.join(file_dir, f"{eval_file_name}")
             with open(file_path, 'w') as file:
                 json.dump(eval_data_dict, file)
         print(f'\nReturn: {totalReturn}, Mean: {np.mean(totalReturn)}, Standard Deviation: {np.std(totalReturn)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')
+        print("Saved to: ", file_path)
