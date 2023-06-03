@@ -22,8 +22,9 @@ class Agent:
     This could optionally all be done in PredatorCapturePrey
     '''
 
-    def __init__(self, index, radius, action_id_to_word, args):
+    def __init__(self, index, id, radius, action_id_to_word, args):
         self.index = index
+        self.id = id
         self.radius = radius
         self.action_id2w = action_id_to_word
         self.args = args
@@ -99,6 +100,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         if self.args.capability_aware:
             self.agent_obs_dim = 3
+        elif self.args.agent_id: # agent ids are one hot encoded
+            self.agent_obs_dim = 3 + self.num_robots * self.args.n_coalitions
         else:
             self.agent_obs_dim = 2
 
@@ -137,7 +140,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
         index = 0
         for idx in range(self.num_robots):
             radius_val = float(getattr(np.random, self.args.traits["radius"]['distribution'])(**func_args))
-            agents.append(Agent(index, radius_val, self.action_id2w, self.args))
+            default_id = ['0'] * (self.num_robots * self.args.n_coalitions)
+            agents.append(Agent(index, default_id, radius_val, self.action_id2w, self.args))
             index += 1
     
         return agents
@@ -162,7 +166,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         index = 0
         for idx, agent in coalition.items():
-            agents.append(Agent(index, agent["radius"], self.action_id2w, self.args))
+            agents.append(Agent(index, agent["id"], agent["radius"], self.action_id2w, self.args))
             index += 1
         return agents
     
@@ -253,7 +257,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 else:
                     observations.append([*self.agent_poses[:, a.index ][:2], a.radius])
             elif self.args.agent_id:    # append agent id
-                observations.append([[*self.agent_poses[:, a.index ][:2]], *one_hot_encode(a.index, self.num_robots)])
+                agent_id = [int(bit) for bit in a.id]
+                observations.append([*self.agent_poses[:, a.index ][:2], *agent_id])
             else:
                 observations.append([*self.agent_poses[:, a.index ][:2]])
             if self.args.delta > -1:
