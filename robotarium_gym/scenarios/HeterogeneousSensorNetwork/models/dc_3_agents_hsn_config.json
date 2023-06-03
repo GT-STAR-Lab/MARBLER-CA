@@ -1,7 +1,7 @@
 {
   "action_selector": "soft_policies",
   "add_value_last_step": true,
-  "agent": "gnn",
+  "agent": "dual_channel_gnn",
   "agent_dist": false,
   "agent_output_type": "pi_logits",
   "alg_yaml": "mappo_gnn",
@@ -10,7 +10,7 @@
   "batch_size_run": 16,
   "buffer_cpu_only": true,
   "buffer_size": 32,
-  "capability_shape": 2,
+  "capability_shape": 1,
   "checkpoint_path": "",
   "critic_type": "cv_critic",
   "detect_autograd_anomaly": false,
@@ -60,7 +60,7 @@
   "save_model": true,
   "save_model_interval": 50000,
   "save_replay": false,
-  "seed": 55382307,
+  "seed": 955660147,
   "separated_policy": false,
   "standardise_returns": false,
   "standardise_rewards": false,
@@ -69,12 +69,12 @@
   "test_greedy": true,
   "test_interval": 50000,
   "test_nepisode": 100,
-  "unique_token": "2023-06-01:08-20-18-PM",
+  "unique_token": "2023-06-02:08-33-11-AM",
   "unit_type": false,
   "use_cuda": false,
   "use_gnn": false,
   "use_graph_attention": false,
   "use_rnn": false,
   "use_tensorboard": true,
-  "which_seed": "seed_2"
+  "which_seed": "seed_3"
 }

@@ -63,10 +63,6 @@ def main():
         agents['test'][i]['radius'] = float(val)
         candidate += 1
 
-    
-
-    
-
     coalitions = generate_coalitions_from_agents(agents, config)
     out = input("Would you like to save these as the new predefined coalitions?[y/N]\n")
     if(out == "y"):

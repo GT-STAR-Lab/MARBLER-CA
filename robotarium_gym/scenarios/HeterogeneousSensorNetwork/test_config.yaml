@@ -1,16 +1,16 @@
 #Arguments needed by main.py
 scenario: HeterogeneousSensorNetwork #name of the folder inside scenarios
 
-model_config_file: config_3.json
-model_file: agent_3.th
+model_config_file: dc_3_agents_hsn_config.json
+model_file: dc_3_agents_hsn_agent_3.th
 
 actor_file: gnn_agent
-actor_class: GNNAgent
+actor_class: DualChannelGNNAgent
 
 env_file: HeterogeneousSensorNetwork
 env_class: HeterogeneousSensorNetwork #This needs to have all of the functionalities of a gym to work
 n_actions: 5 #The number of actions available for the agent
-n_agents: 2
+n_agents: 3
 episodes: 1000 #Number of episodes to run for
 shared_reward: True
 
@@ -46,7 +46,7 @@ dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them
 n_train_agents: 20
 n_test_agents: 20
 n_coalitions: 5
-coalition_file: "custom_5_coalitions_4_robots.yaml"
+coalition_file: "custom_5_coalitions_3_robots.yaml"
 
 traits:
   radius:

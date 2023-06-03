@@ -54,4 +54,4 @@ traits:
 n_train_agents: 100
 n_test_agents: 10
 test: False
-resample: True #Set to true to resample the agents every episode
+resample: False #Set to true to resample the agents every episode

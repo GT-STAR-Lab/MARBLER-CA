@@ -10,7 +10,7 @@ actor_class: GNNAgent
 env_file: HeterogeneousSensorNetwork
 env_class: HeterogeneousSensorNetwork #This needs to have all of the functionalities of a gym to work
 n_actions: 5 #The number of actions available for the agent
-n_agents: 3
+n_agents: 4
 episodes: 10 #Number of episodes to run for
 shared_reward: True
 
