@@ -4,6 +4,7 @@ import copy
 import yaml
 import os
 from copy import deepcopy
+import math
 
 #This file should stay as is when copied to robotarium_eval but local imports must be changed to work with training!
 from robotarium_gym.utilities.roboEnv import roboEnv
@@ -215,7 +216,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         # get the observation and reward from the updated state
         obs     = self.get_observations()
-        rewards, edges = self.get_rewards()
+        rewards, edges, total_overlap = self.get_rewards()
 
         # penalize for collisions, record in info
         violation_occurred = 0
@@ -236,7 +237,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         info = {
                 "violation_occurred": violation_occurred, # not a true count, just binary for if ANY violation occurred
-                "connectivity": edges
+                "connectivity": edges,
+                "total_overlap": total_overlap
                 } 
         
         return obs, [rewards]*self.num_robots, [terminated]*self.num_robots, info
@@ -271,17 +273,35 @@ class HeterogeneousSensorNetwork(BaseEnv):
         reward = 0
         center_reward = []
         edges = 0
-        
+        total_overlap = 0 if self.args.calculate_total_overlap else -1
+
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
             # reward agent if they are more towards the center.
+            x1, y1 = self.agent_poses[:2, a1.index]
             center_reward.append(np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - np.array([0, 0]))))) # push agents towards center
             for j, a2 in enumerate(self.agents[i+1:],i+1): # don't duplicate
-               
+                x2, y2 = self.agent_poses[:2, a2.index]
                 dist = np.sqrt(np.sum(np.square(self.agent_poses[:2, a1.index] - self.agent_poses[:2, a2.index])))
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
                 # reward += -1*abs(difference)
+
+                if(self.args.calculate_total_overlap):
+                    r1 = a1.radius; r2 = a2.radius
+                    overlap = 0.0
+
+                    if dist < r1 + r2:
+                        if dist <= abs(r1 - r2):
+                            # One circle is fully inside the other
+                            overlap = math.pi * min(r1, r2)**2
+                        else:
+                            # Partial overlap
+                            theta1 = math.acos((r1**2 + dist**2 - r2**2) / (2 * r1 * dist))
+                            theta2 = math.acos((r2**2 + dist**2 - r1**2) / (2 * r2 * dist))
+                            overlap = theta1 * r1**2 + theta2 * r2**2 - 0.5 * r1**2 * math.sin(2 * theta1) - 0.5 * r2**2 * math.sin(2 * theta2)
+                    
+                    total_overlap += overlap
 
                 #incur more penatly if the agents boundaries are not touching
                 if(difference < 0): # agents are touching
@@ -295,7 +315,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         reward += -1*min(center_reward) * self.args.dist_reward_multiplier
-        return reward, edges
+        return reward, edges, total_overlap
 
     def shuffle_agents(self, agents):
         """

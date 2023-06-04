@@ -38,8 +38,8 @@ DOWN: .9
 dist_reward_multiplier: 1.0
 test: False #Set this to change the agents that are being selected from
 #If the following two are False, make sure resample is also False
-capability_aware: True #Either the agent know what class they're in or their capabilities. Make sure this matches training
-agent_id: False #If capability_aware is False, this determines if the class id is appended instead or not
+capability_aware: False #Either the agent know what class they're in or their capabilities. Make sure this matches training
+agent_id: True #If capability_aware is False, this determines if the class id is appended instead or not
 dual_channel: False #KEEP FALSE, NOT USED. Changes the observations to make them a 2d array for capabilities and observations if capability_aware is true
 
 #Information needed to generate the predefined agents and coalitions
@@ -61,6 +61,8 @@ coalition_selection: 0
 shuffle_agent_order: False # this will shuffle the order of agents when coalition is sampled
 resample: True #Set to true to resample the agents every episode
 resample_frequency: 10
+
+calculate_total_overlap: False
 
 #KEEP FALSE
 hard_coded_coalition: False
