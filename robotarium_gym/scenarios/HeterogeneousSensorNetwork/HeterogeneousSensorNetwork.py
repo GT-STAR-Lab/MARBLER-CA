@@ -95,6 +95,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
         if self.args.load_from_predefined_coalitions:
             # #Initializes the agents
             self.agents = self.load_agents_from_predefined_coalitions()
+        elif(self.args.load_from_predefined_agents):
+            self.agents = self.load_new_coalition_from_predefined_agents()
         else:
             self.agents = self.load_agents_from_trait_distribution()
 
@@ -170,7 +172,33 @@ class HeterogeneousSensorNetwork(BaseEnv):
             agents.append(Agent(index, agent["id"], agent["radius"], self.action_id2w, self.args))
             index += 1
         return agents
+
+    def load_new_coalition_from_predefined_agents(self):
+        '''Loades the pre-defined agents, and draws a random coalition from them
+        '''
+        t = "train"
+        if self.args.test:
+            t = "test"
+        
+        agent_pool = []
+        agents = []
+            
+        # coalition_idx = self.args.coalition_idx
+        s = str(self.num_robots) + "_agents"
+        for coalition_idx in range(self.n_coalitions):
+            coalition = self.predefined_coalition[t]["coalitions"][s][coalition_idx]
+            
+            index = 0
+            for idx, agent in coalition.items():
+                agent_pool.append(Agent(index, agent["id"], agent["radius"], self.action_id2w, self.args))
+                index += 1
+
+        # sample a coalitions
+        for idx in range(self.num_robots):
+            agents.append(random.choice(agent_pool))
+        return(agents)
     
+
     def reset(self):
         '''
         Resets the simulation
@@ -178,8 +206,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         self.episode_number += 1
         if self.args.resample and (self.episode_number % self.args.resample_frequency == 0):
             if self.args.load_from_predefined_coalitions:
-                # #Initializes the agents
                 self.agents = self.load_agents_from_predefined_coalitions()
+            elif(self.args.load_from_predefined_agents):
+                self.agents = self.load_new_coalition_from_predefined_agents()
             else:
                 self.agents = self.load_agents_from_trait_distribution()
 
