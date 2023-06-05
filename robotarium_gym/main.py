@@ -17,12 +17,12 @@ def main():
     
     config_path = ''
     if module_dir == "":
-        config_file = "config.yaml"
+        config_file = "test_config.yaml"
     elif args.config_dir is not None:
         config_path = os.path.join(args.config_dir)
         config_file = os.path.join(config_path, "config.yaml")
     else:
-        config_path = os.path.join(module_dir, "scenarios", args.scenario,)
+        config_path = os.path.join(module_dir, "scenarios", args.scenario)
         config_file = os.path.join(config_path, "test_config.yaml")
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
