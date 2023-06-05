@@ -56,6 +56,7 @@ traits:
 
 ### For experiment 2, turn load_from_predefined_coalitions to false
 load_from_predefined_coalitions: True # Load coalitions from 'predefined_coalition.yaml'. If False, then loads new agents based on traits distribution.
+load_from_predefined_agents: False # Uses the predefined agents from the predefined_coalition file, but samples new coalitions from these agents.
 manual_coalition_selection: False # IF true, the only sample the coalition coalition_selection from the colaition file for "n_agents"
 coalition_selection: 0
 shuffle_agent_order: False # this will shuffle the order of agents when coalition is sampled

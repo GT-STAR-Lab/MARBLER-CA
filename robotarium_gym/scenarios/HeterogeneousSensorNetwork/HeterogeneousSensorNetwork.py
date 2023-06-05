@@ -97,6 +97,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
             self.agents = self.load_agents_from_predefined_coalitions()
         elif(self.args.load_from_predefined_agents):
             self.agents = self.load_new_coalition_from_predefined_agents()
+            print("Loading from Predefined Agents")
         else:
             self.agents = self.load_agents_from_trait_distribution()
 
@@ -104,7 +105,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         if self.args.capability_aware:
             self.agent_obs_dim = 3
         elif self.args.agent_id: # agent ids are one hot encoded
-            self.agent_obs_dim = 3 + self.num_robots * self.args.n_coalitions
+            self.agent_obs_dim = 2 + self.num_robots * self.args.n_coalitions
         else:
             self.agent_obs_dim = 2
 
@@ -185,7 +186,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
             
         # coalition_idx = self.args.coalition_idx
         s = str(self.num_robots) + "_agents"
-        for coalition_idx in range(self.n_coalitions):
+        for coalition_idx in range(self.args.n_coalitions):
             coalition = self.predefined_coalition[t]["coalitions"][s][coalition_idx]
             
             index = 0
