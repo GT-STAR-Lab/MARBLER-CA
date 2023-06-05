@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.utils import dense_to_sparse
 import sys
 
 class GNNAgent(torch.nn.Module):
@@ -12,7 +11,11 @@ class GNNAgent(torch.nn.Module):
         self.training = training
         self.input_shape = input_shape
         self.message_passes = self.args.num_layers
-
+        self.capabilities_skip_gnn = False
+        if(hasattr(self.args, "capabilities_skip_gnn")):
+            if(self.args.capabilities_skip_gnn):
+                self.capabilities_skip_gnn = True
+                input_shape = input_shape - self.args.capability_shape
         
         self.encoder = nn.Sequential(nn.Linear(input_shape,self.args.hidden_dim),
                                       nn.ReLU(inplace=True))
@@ -25,8 +28,15 @@ class GNNAgent(torch.nn.Module):
                                      nn.ReLU(inplace=True),
                                      nn.Linear(self.args.msg_hidden_dim,self.args.msg_hidden_dim, bias=False))
 
+        policy_head_input_shape = 0
+        if(self.capabilities_skip_gnn):
+            policy_head_input_shape += self.args.capability_shape
+        if(self.message_passes > 0):
+            policy_head_input_shape += self.args.msg_hidden_dim + self.args.hidden_dim
+        else:
+            policy_head_input_shape += self.args.hidden_dim
 
-        self.policy_head = nn.Sequential(nn.Linear(self.args.msg_hidden_dim + self.args.hidden_dim if self.message_passes > 0 else self.args.hidden_dim, self.args.hidden_dim),
+        self.policy_head = nn.Sequential(nn.Linear(policy_head_input_shape, self.args.hidden_dim),
                                          nn.ReLU(inplace=True))
 
         self.actions = nn.Linear(self.args.hidden_dim, self.args.n_actions)
@@ -57,10 +67,10 @@ class GNNAgent(torch.nn.Module):
 
     def forward(self,x, adj_matrix):
         
-        # inp should be (batch_size,input_size)
-        # inp - {iden, vel(2), pos(2), entities(...)}
-
-
+        if(self.capabilities_skip_gnn):
+            capabilities = x[:, -self.args.capability_shape:]
+            x = x[:, :-self.args.capability_shape]
+        
         # Get the Normalized adjacency matrix, and add self-loops  
         if(self.args.normalize_adj_matrix):     
             comm_mat = self.calc_adjacency_hat(adj_matrix)
@@ -91,6 +101,9 @@ class GNNAgent(torch.nn.Module):
             h = torch.cat((enc,msg), dim=-1)
         else:
             h = enc
+
+        if self.capabilities_skip_gnn:
+            h = torch.cat((h, capabilities), dim=-1)
 
         h = self.policy_head(h)
         actions = self.actions(h)

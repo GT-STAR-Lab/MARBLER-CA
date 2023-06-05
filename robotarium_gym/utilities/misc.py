@@ -77,6 +77,7 @@ def load_env_and_model(args, module_dir):
         model_weights = torch.load( os.path.join(module_dir,  "scenarios", args.scenario, "models", args.model_file),\
                                 map_location=torch.device('cpu'))
     input_dim = model_weights[list(model_weights.keys())[0]].shape[1]
+    print(input_dim)
 
     if module_dir == "":
         actor = importlib.import_module(args.actor_file)
@@ -89,6 +90,11 @@ def load_env_and_model(args, module_dir):
     model_config.n_agents = args.n_agents
     if(model_config.agent == "dual_channel_gnn" or model_config.agent == "dual_channel_gat"):
         input_dim = model_weights["channel_A.encoder.0.weight"].shape[1] + model_weights["channel_B.encoder.0.weight"].shape[1]
+    
+    elif(hasattr(model_config, "capabilities_skip_gnn")):
+        if(model_config.capabilities_skip_gnn):
+            input_dim += 1
+    
     model = actor(input_dim, model_config)
     model.load_state_dict(model_weights)
     
@@ -170,17 +176,5 @@ def run_env(config, module_dir, gif_dir=None, eval_dir=None, eval_file_name="def
             "avg_connectivity": totalAvgConnectivity
         }
         
-        if(eval_dir):
-            
-            unique_token = model_config.unique_token
-            file_dir = os.path.join(eval_dir, "eval_saves")
-            if( not os.path.exists(file_dir)):
-                os.makedirs(file_dir)
-            
-            
-            file_path = os.path.join(file_dir, f"{eval_file_name}")
-            with open(file_path, 'w') as file:
-                json.dump(eval_data_dict, file)
         print(f'\nReturn: {totalReturn}, Mean: {np.mean(totalReturn)}, Standard Deviation: {np.std(totalReturn)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')
-        print("Saved to: ", file_path)
