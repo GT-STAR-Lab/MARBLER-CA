@@ -105,7 +105,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
         if self.args.capability_aware:
             self.agent_obs_dim = 3
         elif self.args.agent_id: # agent ids are one hot encoded
-            self.agent_obs_dim = 2 + self.num_robots * self.args.n_coalitions
+            # self.agent_obs_dim = 2 + self.num_robots * self.args.n_coalitions
+            self.agent_obs_dim = 2 + 4 * self.args.n_coalitions #TODO: FIX, THIS IS HACKY
         else:
             self.agent_obs_dim = 2
 
@@ -185,7 +186,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         agents = []
             
         # coalition_idx = self.args.coalition_idx
-        s = str(self.num_robots) + "_agents"
+        # s = str(self.num_robots) + "_agents"
+        s = "4_agents"
+
         for coalition_idx in range(self.args.n_coalitions):
             coalition = self.predefined_coalition[t]["coalitions"][s][coalition_idx]
             
@@ -195,8 +198,12 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 index += 1
 
         # sample a coalitions
+        index = 0
         for idx in range(self.num_robots):
-            agents.append(random.choice(agent_pool))
+            agent = random.choice(agent_pool)
+            agent.index = index
+            agents.append(agent)
+            index += 1
         return(agents)
     
 
@@ -246,7 +253,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
         
         # get the observation and reward from the updated state
         obs     = self.get_observations()
-        rewards, edges, total_overlap = self.get_rewards()
+        rewards, rew_metric_info = self.get_rewards()
 
         # penalize for collisions, record in info
         violation_occurred = 0
@@ -267,9 +274,8 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
         info = {
                 "violation_occurred": violation_occurred, # not a true count, just binary for if ANY violation occurred
-                "connectivity": edges,
-                "total_overlap": total_overlap
-                } 
+                }
+        info.update(rew_metric_info)
         
         return obs, [rewards]*self.num_robots, [terminated]*self.num_robots, info
 
@@ -302,9 +308,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         # Fully shared reward, this is a collaborative environment.
         reward = 0
         center_reward = []
-        edges = 0
+        edge_count = 0
         total_overlap = 0 if self.args.calculate_total_overlap else -1
-
+        edge_set = [] # edges between agents.
         #The agents goal is to get their radii to touch
         for i, a1 in enumerate(self.agents):
             # reward agent if they are more towards the center.
@@ -316,6 +322,10 @@ class HeterogeneousSensorNetwork(BaseEnv):
                 # dist = np.linalg.norm(self.agent_poses[:2, a1.index]) - np.linalg.norm(self.agent_poses[:2, a2.index])
                 difference = dist - (a1.radius + a2.radius)
                 # reward += -1*abs(difference)
+
+                # record if an edge is created by robots
+                if(difference < 0):
+                    edge_set.append((i, j))
 
                 if(self.args.calculate_total_overlap):
                     r1 = a1.radius; r2 = a2.radius
@@ -335,7 +345,7 @@ class HeterogeneousSensorNetwork(BaseEnv):
 
                 #incur more penatly if the agents boundaries are not touching
                 if(difference < 0): # agents are touching
-                    edges += 1
+                    edge_count += 1
                     reward += -0.9 * abs(difference) + 0.05
                 else:
                     reward += -1.1 * abs(difference) - 0.05 
@@ -345,7 +355,9 @@ class HeterogeneousSensorNetwork(BaseEnv):
         #This is to center the agents in the middle of the field
         # reward += min([np.linalg.norm(self.agent_poses[:2, a.index] - [0, 0]) for a in self.agents]) * self.args.dist_reward_multiplier
         reward += -1*min(center_reward) * self.args.dist_reward_multiplier
-        return reward, edges, total_overlap
+        info = {'edge_count': edge_count, 'total_overlap': total_overlap, "edge_set": edge_set}
+        # info = {'edge_count': edge_count, 'total_overlap': total_overlap}
+        return reward, info
 
     def shuffle_agents(self, agents):
         """
