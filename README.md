@@ -1,5 +1,5 @@
 # MARBLER: Multi-Agent RL Benchmark and Learning Environment for the Robotarium
-Fork used for Generalization of Heterogeneous Multi-Robot Policies via Awareness and Communication of Capabilities 
+Fork of [MARBLER](https://shubhlohiya.github.io/MARBLER/) used for Generalization of Heterogeneous Multi-Robot Policies via Awareness and Communication of Capabilities 
 
 ## Installation Instructions
 1. Activate the ca-gnn-marl Conda Environment: `conda activate ca-gnn-marl`. 
