@@ -6,6 +6,7 @@ import json
 import torch
 from rps.utilities.misc import *
 import logging
+import sys
 
 def is_close( agent_poses, agent_index, prey_loc, sensing_radius):
     agent_pose = agent_poses[:2, agent_index]
@@ -61,10 +62,12 @@ def load_env_and_model(args, module_dir):
     ''' 
     Helper function to load a model from a specified scenario in args
     '''
+    models_dir = os.path.join(module_dir, "scenarios", args.scenario, "models")
     if module_dir == "":
         model_config =args.model_config_file
     else:
         model_config = os.path.join(module_dir, "scenarios", args.scenario, "models", args.model_config_file)
+        models_dir = os.path.join(module_dir, "scenarios", args.scenario, "models")
     model_config = objectview(json.load(open(model_config)))
     model_config.n_actions = args.n_actions
 
@@ -74,16 +77,24 @@ def load_env_and_model(args, module_dir):
         model_weights = torch.load( os.path.join(module_dir,  "scenarios", args.scenario, "models", args.model_file),\
                                 map_location=torch.device('cpu'))
     input_dim = model_weights[list(model_weights.keys())[0]].shape[1]
+    print(input_dim)
 
     if module_dir == "":
         actor = importlib.import_module(args.actor_file)
     else:
         actor = importlib.import_module(f'robotarium_gym.utilities.{args.actor_file}')
+        # sys.path.append(models_dir)
+        # actor = importlib.import_module(f'{args.actor_file}')
     actor = getattr(actor, args.actor_class)
     
     model_config.n_agents = args.n_agents
     if(model_config.agent == "dual_channel_gnn" or model_config.agent == "dual_channel_gat"):
         input_dim = model_weights["channel_A.encoder.0.weight"].shape[1] + model_weights["channel_B.encoder.0.weight"].shape[1]
+    
+    elif(hasattr(model_config, "capabilities_skip_gnn")):
+        if(model_config.capabilities_skip_gnn):
+            input_dim += 1
+    
     model = actor(input_dim, model_config)
     model.load_state_dict(model_weights)
     
@@ -98,40 +109,48 @@ def load_env_and_model(args, module_dir):
     return env, model, model_config
 
 
-def run_env(config, module_dir, save_dir=None):
+def run_env(config, module_dir, gif_dir=None, eval_dir=None, eval_file_name="default_eval.json"):
     env, model, model_config = load_env_and_model(config, module_dir)
     obs = np.array(env.reset())
     n_agents = len(obs)
 
-    totalReward = []
+    totalReturn = []
+    totalAvgConnectivity = []
     totalSteps = []
+    totalViolations = []
     try:
         for i in range(config.episodes):
-            episodeReward = 0
+            episodeReturn = 0
             episodeSteps = 0
+            episodeViolations = 0
+            episodeConnectivity = []
             hs = np.array([np.zeros((model_config.hidden_dim, )) for i in range(n_agents)])
             for j in range(config.max_episode_steps+1):      
-                if env.env.visualizer.show_figure and save_dir: 
-                    plt.savefig(f'{save_dir}/episode{i}step{j}.png')
+                if env.env.visualizer.show_figure and gif_dir: 
+                    plt.savefig(f'{gif_dir}/episode{i}step{j}.png')
                 if model_config.obs_agent_id: #Appends the agent id if obs_agent_id is true. TODO: support obs_last_action too
                     obs = np.concatenate([obs,np.eye(n_agents)], axis=1)
 
                 #Gets the q values and then the action from the q values
                 if 'NS' in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs.T))
-                elif hasattr(env, "adj_matrix"):
+                elif "GNN" in config.actor_class or "GAT" in config.actor_class:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(env.adj_matrix))
                 else:
                     q_values, hs = model(torch.Tensor(obs), torch.Tensor(hs))
                     
                 actions = np.argmax(q_values.detach().numpy(), axis=1)
 
-                obs, reward, done, _ = env.step(actions)
+                obs, reward, done, info = env.step(actions)
                 
+                # log data
+                episodeViolations += 1.0 if info["violation_occurred"] else 0.0
+                episodeConnectivity.append(info["connectivity"])
+
                 if model_config.shared_reward:
-                    episodeReward += reward[0]
+                    episodeReturn += reward[0]
                 else:
-                    episodeReward += sum(reward)
+                    episodeReturn += sum(reward)
                 if done[0]:
                     episodeSteps = j+1
                     break
@@ -139,13 +158,23 @@ def run_env(config, module_dir, save_dir=None):
                 episodeSteps = config.max_episode_steps
             obs = np.array(env.reset())
             print('Episode', i+1)
-            print('Episode reward:', episodeReward)
+            print('Episode return:', episodeReturn)
             print('Episode steps:', episodeSteps)
-            totalReward.append(episodeReward)
+            totalReturn.append(episodeReturn)
             totalSteps.append(episodeSteps)
+            totalAvgConnectivity.append(np.mean(episodeConnectivity))
+            totalViolations.append(episodeViolations)
     except Exception as error:
         print(error)
         logging.exception("Fatal Error")
     finally:
-        print(f'\nReward: {totalReward}, Mean: {np.mean(totalReward)}, Standard Deviation: {np.std(totalReward)}')
+
+        eval_data_dict = {
+            "returns": totalReturn,
+            "steps": totalSteps,
+            "violations": totalViolations,
+            "avg_connectivity": totalAvgConnectivity
+        }
+        
+        print(f'\nReturn: {totalReturn}, Mean: {np.mean(totalReturn)}, Standard Deviation: {np.std(totalReturn)}')
         print(f'Steps: {totalSteps}, Mean: {np.mean(totalSteps)}, Standard Deviation: {np.std(totalSteps)}')

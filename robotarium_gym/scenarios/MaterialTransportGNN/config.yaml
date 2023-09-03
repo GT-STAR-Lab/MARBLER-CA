@@ -2,8 +2,8 @@
 scenario: MaterialTransportGNN #name of the folder inside scenarios
 model_config_file: qmix.json #The config file from sacred for the model
 model_file: qmix.th #The saved model weights
-actor_file: rnn_agent #The file the actor model architecture lives in
-actor_class: RNNAgent #The class the actor model architecture is in
+actor_file: gnn_agent #The file the actor model architecture lives in
+actor_class: GNNAgent #The class the actor model architecture is in
 env_file: MaterialTransportGNN #The .py file this environment is in
 env_class: MaterialTransportGNN #This needs to have all of the functionalities of a gym to work
 
@@ -54,4 +54,4 @@ traits:
 n_train_agents: 100
 n_test_agents: 10
 test: False
-resample: True #Set to true to resample the agents every episode
+resample: False #Set to true to resample the agents every episode
