@@ -1,9 +1,10 @@
 # MARBLER: Multi-Agent RL Benchmark and Learning Environment for the Robotarium
-Team: Reza Torbati, Shubham Lohiya, Shivika Singh, Meher Nigam
+Fork used for Generalization of Heterogeneous Multi-Robot Policies via Awareness and Communication of Capabilities 
 
 ## Installation Instructions
 1. Activate the ca-gnn-marl Conda Environment: `conda activate ca-gnn-marl`. 
 2. Download and Install the [Robotarium Python Simulator](https://github.com/robotarium/robotarium_python_simulator)
+- The version of the Robotarium that this code was run with was commit 6bb184e. As of now, the code will run on the most recent version of the Robotarium but will not train.
 3. Install our environment by running `pip install -e .` in this directory
 4. To test successfull installation, run `python3 -m robotarium_gym.main` to run a pretrained model
 
@@ -11,7 +12,7 @@ Team: Reza Torbati, Shubham Lohiya, Shivika Singh, Meher Nigam
 * To look at current scenarios or create new ones or to evaluate trained models, look at the README in robotarium_gym
 * To upload the agents to the Robotarium, look at the README in robotarium_eval
 
-## Training with EPyMARL
+## Training with our version of EPyMARL
 1. Train agents normally using our gym keys
 - For example: `python3 src/main.py with alg_yaml=qmix env_yaml=gymma env_args.time_limit=1000 env_args.key="robotarium_gym:PredatorCapturePrey-v0"`
 - To train faster, ensure `robotarium` is False, `real_time` is False, and `show_figure_frequency` is large or -1 in the environment's `config.yaml`
@@ -22,12 +23,9 @@ Team: Reza Torbati, Shubham Lohiya, Shivika Singh, Meher Nigam
 3. Update the scenario's config.yaml to use the newly trained agents
 
 
-## Citations
-* Entire backend of the code comes from: 
->S. Wilson, P. Glotfelter, L. Wang, S. Mayya, G. Notomista, M. Mote, and M. Egerstedt. The robotarium: Globally impactful opportunities, challenges, and lessons learned in remote-access, distributed control of multirobot systems. IEEE Control Systems Magazine, 40(1):26–44, 2020.
-
-* Code Architecture Inspired By:
-> I. Mordatch and P. Abbeel. Emergence of grounded compositional language in multi-agent populations. CoRR, abs/1703.04908, 2017. URL http://arxiv.org/abs/1703.04908.
-
-* Agent Classes and Trained Weights Comes From:
-> G. Papoudakis, F. Christianos, L. Sch ̈afer, and S. V. Albrecht. Benchmarking multi-agent deep reinforcement learning algorithms in cooperative tasks. In Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks (NeurIPS), 2021. URL http://arxiv.org/abs/2006.07869.
+## Citing
+If you use this fork of MARBLER, please cite:
+* MARBLER:
+> Reza Torbati, Shubham Lohiya, Shivika Singh, Meher Shashwat Nigam, & Harish Ravichandar. (2023). MARBLER: An Open Platform for Standarized Evaluation of Multi-Robot Reinforcement Learning Algorithms. 
+* Our paper:
+> Pierce Howell, Max Rudolph, Reza Torbati, Kevin Fu, & Harish Ravichandar (2023). Generalization of Heterogeneous Multi-Robot Policies via Awareness and Communication of Capabilities. In 7th Annual Conference on Robot Learning.
