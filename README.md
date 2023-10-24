@@ -2,7 +2,7 @@
 Fork of [MARBLER](https://shubhlohiya.github.io/MARBLER/) used for Generalization of Heterogeneous Multi-Robot Policies via Awareness and Communication of Capabilities 
 
 ## Installation Instructions
-1. Activate the ca-gnn-marl Conda Environment: `conda activate ca-gnn-marl`. 
+1. Activate the cap-comm Conda Environment: `conda activate cap-comm`. 
 2. Download and Install the [Robotarium Python Simulator](https://github.com/robotarium/robotarium_python_simulator)
 - The version of the Robotarium that this code was run with was commit 6bb184e. As of now, the code will run on the most recent version of the Robotarium but will not train.
 3. Install our environment by running `pip install -e .` in this directory
